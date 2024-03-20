@@ -1,95 +1,64 @@
-import Image from "next/image";
+"use client";
+import React, { useState, ChangeEvent } from "react";
 import styles from "./page.module.css";
+import extractTelemetry from "@/utils/utils";
 
-export default function Home() {
+const Home: React.FC = () => {
+  const [fileName, setFileName] = useState<string>("");
+  const [loading, setLoading] = useState<boolean>(false);
+  const [progress, setProgress] = useState<number>(0);
+  const [resultLink, setResultLink] = useState<string>("");
+  const [error, setError] = useState<string>("");
+  const [elapsed, setElapsed] = useState<number | null>(null);
+  const progressFunction = (progress: number) => {
+    setProgress(progress * 100);
+  };
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      const file = files[0];
+      setFileName(file.name);
+      try {
+        setLoading(true);
+        const startTime = performance.now();
+        const result = await extractTelemetry(file, progressFunction);
+        const endTime = performance.now();
+        setElapsed((endTime - startTime) / 1000);
+
+        setResultLink(result);
+        setLoading(false);
+      } catch (error) {
+        console.error("Error extracting telemetry from file:", error);
+        setError("Error extracting telemetry from file: " + error);
+        setLoading(false);
+      }
+    }
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <main className={styles.container}>
+      <div className={styles.inputContainer}>
+        <input type="file" accept="video/mp4" onChange={handleFileChange} />
       </div>
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
+      {fileName && <p>Uploaded file: {fileName}</p>}
 
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
+      {loading ? (
+        <p>Extracting telemetry... Progress: {progress}%</p>
+      ) : error ? (
+        <p>Error: {error}</p>
+      ) : (
+        resultLink && (
+          <>
+            <a href={resultLink} download="telemetry.geojson">
+              Download
+            </a>
+            <p>Elapsed time: {elapsed}s</p>
+          </>
+        )
+      )}
     </main>
   );
-}
+};
+
+export default Home;
