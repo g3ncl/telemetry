@@ -90,7 +90,8 @@ const extractTelemetry = async (file, progressFunction) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        const blob = new Blob([JSON.stringify(response.json)]);
+        const data = response.json;
+        const blob = new Blob([JSON.stringify(data.data)]);
         const url = URL.createObjectURL(blob);
         resolve(url);
       });
