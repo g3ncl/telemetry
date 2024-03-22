@@ -40,3 +40,6 @@ certificates
 #media
 *.mp4
 *.MP4
+
+#raw data
+*.bin

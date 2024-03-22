@@ -1,5 +1,18 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { FFprobeWorker } from "ffprobe-wasm";
+//import pako from "pako";
+//import { goProTelemetry } from "gopro-telemetry";
+
+/*async function bufferToBase64(buffer) {
+  // use a FileReader to generate a base64 data URI:
+  const base64url = await new Promise((r) => {
+    const reader = new FileReader();
+    reader.onload = () => r(reader.result);
+    reader.readAsDataURL(new Blob([buffer]));
+  });
+  // remove the `data:...;base64,` part from the start
+  return base64url.slice(base64url.indexOf(",") + 1);
+}*/
 
 const getStreamIndex = async (file) => {
   try {
@@ -59,48 +72,51 @@ const extractTelemetry = async (file, progressFunction) => {
         "telemetry.bin",
       ]);
       const rawFile = await ffmpeg.readFile("telemetry.bin");
+
       await ffmpeg.unmount(inputDir);
       await ffmpeg.deleteDir(inputDir);
       ffmpeg.terminate();
 
-      const fileReader = new FileReader();
-      fileReader.onload = function (event) {
-        const base64String = btoa(event.target.result);
+      const blob = new Blob([rawFile], { type: "application/octet-stream" });
+      const formData = new FormData();
 
-        // Create a JSON object including the Base64 string
-        const jsonObject = {
-          binaryData: base64String,
-        };
+      // Append the File object to the FormData object
+      formData.append("file", blob);
+      // Make a POST request using fetch
+      fetch("http://localhost:3000/api/extraction/raw-to-gps", {
+        method: "POST",
+        body: formData,
+      }).then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        const blob = new Blob([JSON.stringify(response.json)]);
+        const url = URL.createObjectURL(blob);
+        resolve(url);
+      });
 
-        // Convert JSON object to a JSON string
-        const jsonString = JSON.stringify(jsonObject);
-
-        // Make the POST request
-        fetch("/api/telemetry", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json", // Specify JSON content type
-          },
-          body: jsonString,
-        })
-          .then(async (response) => {
-            if (!response.ok) {
-              throw new Error(`Failed to fetch GeoJSON: ${response.status}`);
-            }
-            const geojsonBlob = await response.blob();
-            const geojsonURL = URL.createObjectURL(geojsonBlob);
-            resolve(geojsonURL);
-          })
-          .catch((error) => {
-            reject(error);
-          });
+      //const compressedData = pako.deflate(rawFile);
+      //const base64data = await bufferToBase64(rawFile);
+      //resolve(base64data);
+      //resolve(rawFile);
+      /*const buffer = await blob.arrayBuffer();
+      const worker = new Worker(new URL("./worker.js", import.meta.url));
+      worker.onmessage = function (event) {
+        const { type, data } = event.data;
+        if (type === "progress") {
+          console.log("Progress:", data);
+          progressFunction(data);
+        } else if (type === "result") {
+          worker.terminate();
+          const blob = new Blob([JSON.stringify(data)]);
+          const url = URL.createObjectURL(blob);
+          console.log(data);
+          resolve(url); // Resolve the promise with the URL
+        }
       };
-
-      // Read the file
-      const blob = new Blob([rawFile]);
-      fileReader.readAsBinaryString(blob);
+      worker.postMessage(Buffer.from(buffer));*/
     } catch (error) {
-      reject(error);
+      reject(error); // Reject the promise if any error occurs
     }
   });
 };

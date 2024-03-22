@@ -21,11 +21,32 @@ const Home: React.FC = () => {
       try {
         setLoading(true);
         const startTime = performance.now();
-        const result = await extractTelemetry(file, progressFunction);
-        const endTime = performance.now();
-        setElapsed((endTime - startTime) / 1000);
+        const url = await extractTelemetry(file, progressFunction);
+        /*const response = await fetch(
+          //"https://temaf5yf4i.execute-api.eu-west-3.amazonaws.com/default/KartTelemetry",
+          //"https://y7cpciu5r73k54d4ltea4oxrxu0mfpcm.lambda-url.eu-west-3.on.aws/",
+          "https://h33jzkgu3c5a5aksyhcbmcpzqm0kjefh.lambda-url.eu-west-3.on.aws/",
+          {
+            method: "POST",
+            body: JSON.stringify({
+              data: binaryData,
+              options: {
+                stream: ["GPS"],
+                GPSFix: 3,
+                preset: "geojson",
+                timeIn: "GPS",
+              },
+            }),
+          }
+        );
 
-        setResultLink(result);
+        const result = await response.json();*/
+        const endTime = performance.now();
+
+        setElapsed((endTime - startTime) / 1000);
+        //const blob = new Blob([binaryData]);
+        //const url = URL.createObjectURL(blob);
+        setResultLink(url);
         setLoading(false);
       } catch (error) {
         console.error("Error extracting telemetry from file:", error);

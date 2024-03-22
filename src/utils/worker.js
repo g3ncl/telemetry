@@ -1,7 +1,6 @@
 import { goProTelemetry } from "gopro-telemetry";
 
 const progressHandler = (progress) => {
-  console.log(progress);
   self.postMessage({ type: "progress", data: progress });
 };
 
@@ -13,8 +12,13 @@ self.onmessage = async function (event) {
   console.log("starting");
   const telemetry = await goProTelemetry(
     { rawData: data },
-    { stream: ["GPS"], GPSFix: 2, preset: "geojson", progress: progressHandler }
+    {
+      stream: ["GPS"],
+      GPSFix: 3,
+      preset: "geojson",
+      progress: progressHandler,
+    }
   );
-  console.log("completed");
+  console.log("completed", telemetry);
   self.postMessage({ type: "result", data: telemetry });
 };
