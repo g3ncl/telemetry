@@ -83,7 +83,7 @@ const extractTelemetry = async (file, progressFunction) => {
       // Append the File object to the FormData object
       formData.append("file", blob);
       // Make a POST request using fetch
-      fetch("http://localhost:3000/api/extraction/raw-to-gps", {
+      fetch("/api/extraction/raw-to-gps", {
         method: "POST",
         body: formData,
       }).then((response) => {
