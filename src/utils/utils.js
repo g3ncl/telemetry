@@ -86,11 +86,11 @@ const extractTelemetry = async (file, progressFunction) => {
       fetch("/api/extraction/raw-to-gps", {
         method: "POST",
         body: formData,
-      }).then((response) => {
+      }).then(async (response) => {
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
-        const data = response.json;
+        const data = await response.json();
         const blob = new Blob([JSON.stringify(data.data)]);
         const url = URL.createObjectURL(blob);
         resolve(url);
