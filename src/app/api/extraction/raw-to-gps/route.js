@@ -13,9 +13,10 @@ export async function POST(req) {
       );
     }
 
-    const buffer = await file.arrayBuffer();
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
     const telemetry = await goProTelemetry(
-      { rawData: Buffer.from(buffer) },
+      { rawData: buffer },
       {
         stream: ["GPS"],
         GPSFix: 3,
