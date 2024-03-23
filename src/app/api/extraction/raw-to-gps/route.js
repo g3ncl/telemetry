@@ -1,6 +1,6 @@
 import { goProTelemetry } from "gopro-telemetry";
 import { NextResponse } from "next/server";
-
+import { unzlibSync } from "fflate/node";
 export async function POST(req) {
   try {
     const fd = await req.formData();
@@ -15,8 +15,12 @@ export async function POST(req) {
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+
+    const decompressedArray = unzlibSync(buffer);
+    const decompressedBuffer = Buffer.from(decompressedArray);
+
     const telemetry = await goProTelemetry(
-      { rawData: buffer },
+      { rawData: decompressedBuffer },
       {
         stream: ["GPS"],
         GPSFix: 3,
