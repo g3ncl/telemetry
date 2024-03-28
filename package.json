@@ -12,9 +12,8 @@
     "@ffmpeg/ffmpeg": "^0.12.10",
     "@ffmpeg/util": "^0.12.1",
     "egm96-universal": "^1.1.0",
-    "fflate": "^0.8.2",
     "ffprobe-wasm": "^0.3.1",
-    "gopro-telemetry": "^1.2.5",
+    "gopro-telemetry": "github:cgen0/gopro-telemetry",
     "next": "14.1.3",
     "react": "^18",
     "react-dom": "^18"

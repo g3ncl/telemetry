@@ -1,6 +1,5 @@
 import { FFmpeg } from "@ffmpeg/ffmpeg";
 import { FFprobeWorker } from "ffprobe-wasm";
-import { zlibSync } from "fflate";
 
 const getStreamIndex = async (file) => {
   try {
@@ -65,26 +64,26 @@ const extractTelemetry = async (file, progressFunction) => {
       await ffmpeg.deleteDir(inputDir);
       ffmpeg.terminate();
 
-      const compressedData = zlibSync(rawFile, { level: 6 });
-      const blob = new Blob([compressedData], {
-        type: "application/octet-stream",
-      });
-      const formData = new FormData();
-
-      formData.append("file", blob);
-
-      fetch("/api/extraction/raw-to-gps", {
-        method: "POST",
-        body: formData,
-      }).then(async (response) => {
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+      const worker = new Worker(new URL("./worker.js", import.meta.url));
+      var startTime;
+      worker.onmessage = function (event) {
+        const { type, data } = event.data;
+        if (type === "progress") {
+          console.log("Progress:", data);
+          progressFunction(data);
+        } else if (type === "result") {
+          worker.terminate();
+          const endTime = performance.now();
+          console.log("Time: " + (endTime - startTime).toString());
+          const gpxBlob = new Blob([JSON.stringify(data)], {
+            type: "application/json",
+          });
+          const url = URL.createObjectURL(gpxBlob);
+          resolve(url); // Resolve the promise with the URL
         }
-        const data = await response.json();
-        const receivedFile = new Blob([JSON.stringify(data.data)]);
-        const url = URL.createObjectURL(receivedFile);
-        resolve(url);
-      });
+      };
+      startTime = performance.now();
+      worker.postMessage(rawFile);
     } catch (error) {
       reject(error);
     }
