@@ -88,14 +88,14 @@ const Home: React.FC = () => {
       </div>
 
       {loading ? (
-        <p className={styles.progressMessage}>
+        <div className={styles.progressMessage}>
           <div className={styles.progressBar}>
             <div
               className={styles.progressFill}
               style={{ width: `${progress}%` }}
             ></div>
           </div>
-        </p>
+        </div>
       ) : error ? (
         <p className={styles.errorMessage}>Error: {error}</p>
       ) : (
