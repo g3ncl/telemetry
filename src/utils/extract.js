@@ -22,12 +22,9 @@ const extractTelemetry = async (file, progressFunction) => {
   return new Promise(async (resolve, reject) => {
     try {
       const ffmpeg = new FFmpeg();
-      ffmpeg.on("log", ({ message }) => {
-        console.log(message);
-      });
+      ffmpeg.on("log", ({ message }) => {});
       ffmpeg.on("progress", ({ progress }) => {
-        progressFunction(progress);
-        console.log(progress * 100);
+        progressFunction(progress / 2);
       });
 
       await ffmpeg.load({
@@ -69,17 +66,11 @@ const extractTelemetry = async (file, progressFunction) => {
       worker.onmessage = function (event) {
         const { type, data } = event.data;
         if (type === "progress") {
-          console.log("Progress:", data);
-          progressFunction(data);
+          progressFunction(0.5 + data / 2);
         } else if (type === "result") {
           worker.terminate();
           const endTime = performance.now();
-          console.log("Time: " + (endTime - startTime).toString());
-          const gpxBlob = new Blob([JSON.stringify(data)], {
-            type: "application/json",
-          });
-          const url = URL.createObjectURL(gpxBlob);
-          resolve(url); // Resolve the promise with the URL
+          resolve(data);
         }
       };
       startTime = performance.now();

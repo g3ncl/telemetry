@@ -1,11 +1,106 @@
 .container {
+  align-items: center;
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100vh;
+  margin: 8rem 2rem;
 }
 
 .inputContainer {
-  margin-bottom: 20px;
+  margin-bottom: 2rem;
+}
+
+.uploadInput {
+  display: none;
+}
+
+.fileInput {
+  background-color: transparent;
+  border: 3px solid rgb(252 70 100);
+  color: rgb(255 255 255);
+  cursor: pointer;
+  display: inline-block;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  overflow: hidden;
+  padding: 0.75rem 1.5rem;
+  position: relative;
+  text-align: center;
+  text-decoration: none;
+  z-index: 1;
+}
+
+.fileInput::before {
+  background-color: rgb(252 70 100);
+  content: " ";
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transform: translateX(-100%);
+  transition: all 0.3s;
+  width: 100%;
+  z-index: -1;
+}
+
+.fileInput:hover::before {
+  transform: translateX(0);
+}
+
+.progressMessage,
+.errorMessage {
+  font-size: 1.25rem;
+  font-weight: 500;
+}
+
+.sessionStart {
+  font-size: 1.75rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
+  text-align: center;
+  width: 100%;
+}
+
+.lapRow,
+.lapsTableHeader {
+  font-size: 1.25rem;
+  font-weight: 400;
+  text-align: center;
+}
+
+.lapsTableHeader th {
+  font-weight: 600;
+  padding: 0 1rem;
+}
+
+.downloadLink {
+  color: rgb(252 70 100);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.downloadLink:hover {
+  text-decoration: underline;
+}
+
+.lapsContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.progressBar {
+  background: rgb(255 255 255);
+  border-radius: 0;
+  height: 0.25rem;
+  max-width: 300px;
+  width: 50vw;
+}
+
+.progressFill {
+  background: white;
+  border-radius: 0;
+  content: "";
+  height: 0.25rem;
+  transition: width 0.1s ease-in-out;
 }

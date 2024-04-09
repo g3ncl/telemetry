@@ -12,6 +12,7 @@ self.onmessage = async function (event) {
     {
       stream: ["GPS"],
       GPSFix: 3,
+      GPSPrecision: 300,
       preset: "geojson",
       progress: progressHandler,
     }

@@ -1,3 +1,4 @@
 {
-  "extends": "next/core-web-vitals"
+  "plugins": ["css-modules"],
+  "extends": ["plugin:css-modules/recommended", "next/core-web-vitals"]
 }
