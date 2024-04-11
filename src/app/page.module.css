@@ -1,5 +1,7 @@
 .container {
   align-items: center;
+  background-color: var(--background-color); /* Apply background color */
+  color: var(--text-color); /* Apply text color */
   display: flex;
   flex-direction: column;
   margin: 8rem 2rem;
@@ -15,8 +17,8 @@
 
 .fileInput {
   background-color: transparent;
-  border: 3px solid rgb(252 70 100);
-  color: rgb(255 255 255);
+  border: 3px solid var(--primary-color);
+  color: var(--secondary-color);
   cursor: pointer;
   display: inline-block;
   font-family: inherit;
@@ -31,7 +33,7 @@
 }
 
 .fileInput::before {
-  background-color: rgb(252 70 100);
+  background-color: var(--primary-color);
   content: " ";
   height: 100%;
   left: 0;
@@ -43,8 +45,13 @@
   z-index: -1;
 }
 
-.fileInput:hover::before {
+.fileInput:hover::before,
+.fileInput:active::before {
   transform: translateX(0);
+}
+
+.fileInput:active::before {
+  background-image: linear-gradient(rgb(0 0 0/20%) 0 0);
 }
 
 .progressMessage,
@@ -74,7 +81,7 @@
 }
 
 .downloadLink {
-  color: rgb(252 70 100);
+  color: var(--primary-color);
   font-weight: 500;
   text-decoration: none;
 }
@@ -90,7 +97,7 @@
 }
 
 .progressBar {
-  background: rgb(255 255 255);
+  background: var(--secondary-color);
   border-radius: 0;
   height: 0.25rem;
   max-width: 300px;
@@ -98,7 +105,7 @@
 }
 
 .progressFill {
-  background: rgb(252 70 100);
+  background: var(--primary-color);
   border-radius: 0;
   content: "";
   height: 0.25rem;
