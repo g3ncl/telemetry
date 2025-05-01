@@ -1,5 +1,13 @@
-const fLStart: [number, number] = [15.72450497789204, 40.59783849232635];
-const fLEnd: [number, number] = [15.72485480362428, 40.59780996381788];
+const tracks: { fLStart: [number, number]; fLEnd: [number, number] }[] = [
+  {
+    fLStart: [15.72450497789204, 40.59783849232635],
+    fLEnd: [15.72485480362428, 40.59780996381788],
+  }, // Tito
+  {
+    fLStart: [16.311973832554074, 40.56100840695992],
+    fLEnd: [16.311696223947372, 40.56096408671552],
+  }, // Salandra
+];
 
 const interpolateGeoJSON = (geoJSON: GeoJSON): GeoJSON => {
   const { geometry, properties } = geoJSON;
@@ -57,8 +65,12 @@ const interpolateGeoJSON = (geoJSON: GeoJSON): GeoJSON => {
 };
 const crossedTheFinishLine = (
   point: [number, number],
-  previousPoint: [number, number]
+  previousPoint: [number, number],
+  trackIndex: number = 0
 ): boolean => {
+  const fLStart = tracks[trackIndex].fLStart;
+  const fLEnd = tracks[trackIndex].fLEnd;
+
   if (
     point[1] <= Math.min(fLStart[1], fLEnd[1]) ||
     point[1] >= Math.max(fLStart[1], fLEnd[1])
@@ -84,7 +96,7 @@ const crossedTheFinishLine = (
   return false; // Point did not cross the finish line
 };
 
-const splitTelemetryByLaps = (data: GeoJSON): Lap[] => {
+const splitTelemetryByLaps = (data: GeoJSON, trackIndex: number = 0): Lap[] => {
   // Read the GeoJSON file
   try {
     data = interpolateGeoJSON(data);
@@ -116,7 +128,8 @@ const splitTelemetryByLaps = (data: GeoJSON): Lap[] => {
         i !== 0 &&
         crossedTheFinishLine(
           [point[0], point[1]],
-          [coordinates[i - 1][0], coordinates[i - 1][1]]
+          [coordinates[i - 1][0], coordinates[i - 1][1]],
+          trackIndex
         )
       ) {
         //Not saving first segment, because is not a complete lap

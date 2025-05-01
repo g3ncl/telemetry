@@ -1,14 +1,19 @@
 "use client";
-import React, { useState, ChangeEvent } from "react";
+import React, { useState, ChangeEvent, useRef } from "react";
 import styles from "./page.module.css";
 import extractTelemetry from "@/utils/extract";
 import splitTelemetryByLaps from "@/utils/splitLaps";
+
+const tracks = ["Tito", "Salandra"];
 
 const Home: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string>("");
   const [laps, setLaps] = useState<Lap[] | undefined>(undefined);
+  const [selectedTrackIndex, setSelectedTrackIndex] = useState(0); // Default to the first track
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const progressFunction = (progress: number) => {
     setProgress(progress * 100);
@@ -52,39 +57,106 @@ const Home: React.FC = () => {
     return `${formattedDate}, ${formattedTime}`;
   };
 
-  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files && files.length > 0) {
-      const file = files[0];
-      try {
-        setLoading(true);
-        const data: GeoJSON = await extractTelemetry(file, progressFunction);
-        const laps: Lap[] = splitTelemetryByLaps(data);
-        setLaps(laps);
-        setLoading(false);
-        setProgress(0);
-      } catch (error) {
-        console.error("Error extracting telemetry from file:", error);
-        setError("Error extracting telemetry from file: " + error);
-        setLoading(false);
-        setProgress(0);
-      }
+  const processFile = async (file: File) => {
+    try {
+      setLoading(true);
+      const data: GeoJSON = await extractTelemetry(file, progressFunction);
+      const extractedLaps: Lap[] = splitTelemetryByLaps(data);
+      setLaps(extractedLaps);
+      setLoading(false);
+      setProgress(0);
+    } catch (error) {
+      handleError(error);
     }
+  };
+
+  const handleFileSelect = async () => {
+    if ("showOpenFilePicker" in window) {
+      try {
+        // @ts-ignore: The File System Access API is not yet recognized by TypeScript
+        const [fileHandle] = await window.showOpenFilePicker({
+          types: [
+            {
+              description: "Video Files",
+              accept: {
+                "video/mp4": [".mp4"],
+              },
+            },
+          ],
+        });
+        const file = await fileHandle.getFile();
+        await processFile(file);
+      } catch (error) {
+        handleError(error);
+      }
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
+
+  const handleFileChange = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      await processFile(file);
+    }
+  };
+
+  const handleError = (error: unknown) => {
+    if (error instanceof DOMException && error.name === "AbortError") {
+      console.log("File selection was cancelled by the user.");
+      setLoading(false);
+      setProgress(0);
+      return;
+    }
+
+    if (error instanceof Error) {
+      console.error("Error processing file:", error);
+      setError("Error processing file: " + error.message);
+    } else {
+      console.error("An unknown error occurred");
+      setError("An unknown error occurred");
+    }
+    setLoading(false);
+    setProgress(0);
+  };
+  const handleTrackChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedTrackIndex(parseInt(event.target.value));
   };
 
   return (
     <main className={styles.container}>
-      <div className={styles.inputContainer}>
-        <label className={styles.fileInput} htmlFor="upload">
-          <input
-            type="file"
-            id="upload"
-            className={styles.uploadInput}
-            accept="video/mp4"
-            onChange={handleFileChange}
-          />
-          Load File
+      <div className={styles.trackSelectContainer}>
+        <label htmlFor="trackSelect" className={styles.trackSelectLabel}>
+          Select Track:
         </label>
+        <select
+          id="trackSelect"
+          value={selectedTrackIndex}
+          onChange={handleTrackChange}
+          className={styles.trackSelect}
+        >
+          {tracks.map((track, index) => (
+            <option key={index} value={index}>
+              {track}
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className={styles.inputContainer}>
+        <button
+          disabled={loading}
+          className={styles.fileInput}
+          onClick={handleFileSelect}
+        >
+          Load File
+        </button>
+        <input
+          type="file"
+          ref={fileInputRef}
+          style={{ display: "none" }}
+          accept="video/mp4"
+          onChange={handleFileChange}
+        />
       </div>
 
       {loading ? (
