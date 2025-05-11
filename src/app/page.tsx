@@ -3,6 +3,7 @@ import React, { useState, ChangeEvent, useRef } from "react";
 import styles from "./page.module.css";
 import extractTelemetry from "@/utils/extract";
 import splitTelemetryByLaps from "@/utils/splitLaps";
+//import { convertGpxToGeoJson } from "@/utils/gpxToGeoJson";
 
 const tracks = ["Tito", "Salandra"];
 
@@ -61,7 +62,15 @@ const Home: React.FC = () => {
     try {
       setLoading(true);
       const data: GeoJSON = await extractTelemetry(file, progressFunction);
-      const extractedLaps: Lap[] = splitTelemetryByLaps(data);
+
+      // For testing purposes, using only the gpx file
+      //const gpxString = await file.text();
+      //const data: GeoJSON = await convertGpxToGeoJson(gpxString);
+
+      const extractedLaps: Lap[] = splitTelemetryByLaps(
+        data,
+        selectedTrackIndex
+      );
       setLaps(extractedLaps);
       setLoading(false);
       setProgress(0);

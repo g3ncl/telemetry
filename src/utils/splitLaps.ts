@@ -1,7 +1,7 @@
 const tracks: { fLStart: [number, number]; fLEnd: [number, number] }[] = [
   {
-    fLStart: [15.72450497789204, 40.59783849232635],
-    fLEnd: [15.72485480362428, 40.59780996381788],
+    fLStart: [15.724561, 40.597828],
+    fLEnd: [15.724723, 40.59782],
   }, // Tito
   {
     fLStart: [16.311973832554074, 40.56100840695992],
@@ -71,31 +71,48 @@ const crossedTheFinishLine = (
   const fLStart = tracks[trackIndex].fLStart;
   const fLEnd = tracks[trackIndex].fLEnd;
 
-  if (
-    point[1] <= Math.min(fLStart[1], fLEnd[1]) ||
-    point[1] >= Math.max(fLStart[1], fLEnd[1])
-  ) {
-    return false;
-  }
-  // Calculate the latitude of the finish line at the point's longitude using linear interpolation
-  const finishLineLatitudeAtPoint =
-    ((point[0] - fLStart[0]) * (fLEnd[1] - fLStart[1])) /
-      (fLEnd[0] - fLStart[0]) +
-    fLStart[1];
-  const finishLineLatitudeAtPreviousPoint =
-    ((previousPoint[0] - fLStart[0]) * (fLEnd[1] - fLStart[1])) /
-      (fLEnd[0] - fLStart[0]) +
-    fLStart[1];
-  // Check if point latitude is greater or less than the finish line latitude at the point's longitude
-  if (
-    point[1] >= finishLineLatitudeAtPoint &&
-    previousPoint[1] < finishLineLatitudeAtPreviousPoint
-  ) {
-    return true; // Point crossed the finish line
-  }
-  return false; // Point did not cross the finish line
-};
+  // Helper function to calculate orientation of triplet (p, q, r)
+  const orientation = (
+    p: [number, number],
+    q: [number, number],
+    r: [number, number]
+  ): number => {
+    const val = (q[1] - p[1]) * (r[0] - q[0]) - (q[0] - p[0]) * (r[1] - q[1]);
+    if (val === 0) return 0; // collinear
+    return val > 0 ? 1 : 2; // clockwise or counterclockwise
+  };
 
+  // Check if point q lies on segment pr
+  const onSegment = (
+    p: [number, number],
+    q: [number, number],
+    r: [number, number]
+  ): boolean => {
+    return (
+      q[0] <= Math.max(p[0], r[0]) &&
+      q[0] >= Math.min(p[0], r[0]) &&
+      q[1] <= Math.max(p[1], r[1]) &&
+      q[1] >= Math.min(p[1], r[1])
+    );
+  };
+
+  // Check if two segments intersect
+  const o1 = orientation(previousPoint, point, fLStart);
+  const o2 = orientation(previousPoint, point, fLEnd);
+  const o3 = orientation(fLStart, fLEnd, previousPoint);
+  const o4 = orientation(fLStart, fLEnd, point);
+
+  // General case
+  if (o1 !== o2 && o3 !== o4) return true;
+
+  // Special Cases
+  if (o1 === 0 && onSegment(previousPoint, fLStart, point)) return true;
+  if (o2 === 0 && onSegment(previousPoint, fLEnd, point)) return true;
+  if (o3 === 0 && onSegment(fLStart, previousPoint, fLEnd)) return true;
+  if (o4 === 0 && onSegment(fLStart, point, fLEnd)) return true;
+
+  return false;
+};
 const splitTelemetryByLaps = (data: GeoJSON, trackIndex: number = 0): Lap[] => {
   // Read the GeoJSON file
   try {
