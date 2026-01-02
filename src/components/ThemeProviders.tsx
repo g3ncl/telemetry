@@ -9,14 +9,12 @@ import { ReactNode } from 'react';
 interface ThemeProvidersProps {
   children: ReactNode;
   locale: Locale;
-  fontFamily: string;
-  fontFamilyMonospace: string;
 }
 
-export function ThemeProviders({ children, locale, fontFamily, fontFamilyMonospace }: ThemeProvidersProps) {
+export function ThemeProviders({ children, locale }: ThemeProvidersProps) {
   const theme = createTheme({
-    fontFamily,
-    fontFamilyMonospace,
+    fontFamily: '"Barlow Semi Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+    fontFamilyMonospace: '"JetBrains Mono", ui-monospace, monospace',
     primaryColor: 'brand',
     colors: {
       brand: [
