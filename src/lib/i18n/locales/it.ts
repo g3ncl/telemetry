@@ -1,0 +1,118 @@
+import type { TranslationKeys } from './en';
+
+export const it: TranslationKeys = {
+  // App
+  appName: 'Kart Telemetry',
+  appDescription: 'Estrazione telemetria GPS e analisi giri',
+
+  // Navigation
+  nav: {
+    extract: 'Estrai',
+    savedLaps: 'Giri Salvati',
+    analyze: 'Analizza',
+    settings: 'Impostazioni',
+  },
+
+  // Extract Section
+  extract: {
+    title: 'Estrai Telemetria',
+    subtitle: 'Carica file MP4, GPX, GeoJSON o CSV',
+    loadFile: 'Carica File',
+    extracting: 'Estrazione telemetria...',
+    convertingGpx: 'Conversione GPX...',
+    parsingGeojson: 'Parsing GeoJSON...',
+    parsingCsv: 'Parsing CSV...',
+    processing: 'Elaborazione...',
+    advancedSettings: 'Impostazioni Avanzate',
+    hideSettings: 'Nascondi impostazioni',
+    forceTrack: 'Forza Circuito',
+    overrideAutoDetect: 'Ignora rilevamento automatico',
+    autoDetect: 'Rilevamento automatico',
+    driverName: 'Nome pilota',
+    saveSelected: 'Salva Selezionati',
+    lap: 'Giro',
+    time: 'Tempo',
+    noLapsFound: 'Nessun giro trovato. Assicurati di aver attraversato il traguardo.',
+    unsupportedFileType: 'Tipo di file non supportato. Usa MP4, GPX, GeoJSON o CSV.',
+    couldNotDetectTrack:
+      'Impossibile rilevare il circuito. I dati GPS non sono entro 2km da nessun circuito conosciuto. Usa le Impostazioni Avanzate per selezionare manualmente.',
+  },
+
+  // Saved Laps Section
+  saved: {
+    title: 'Giri Salvati',
+    lapsCount: '{count} giro salvato',
+    lapsCountPlural: '{count} giri salvati',
+    noSavedLaps: 'Nessun giro salvato',
+    goToExtract: 'Vai alla sezione Estrai per caricare e salvare i giri',
+    driver: 'Pilota',
+    track: 'Circuito',
+    session: 'Sessione',
+    confirmDelete: 'Eliminare questo giro?',
+    namePlaceholder: 'Nome',
+  },
+
+  // Analyze Section
+  analyze: {
+    title: 'Analizza',
+    subtitle: 'Confronta due giri',
+    needTwoLaps: 'Servono almeno 2 giri salvati',
+    lap1Label: 'Giro 1',
+    lap2Label: 'Giro 2',
+    selectPlaceholder: 'Seleziona...',
+    selectTwoLaps: 'Seleziona due giri sopra per confrontare',
+    speedComparison: 'Confronto Velocità',
+    speedUnit: 'Velocità (km/h)',
+    distanceUnit: 'Distanza (m)',
+    deltaTime: 'Delta (s)',
+    driver1: 'Pilota 1',
+    driver2: 'Pilota 2',
+    delta: 'Delta',
+    deltaVs: 'Delta ({driver2} vs {driver1})',
+  },
+
+  // Settings Section
+  settings: {
+    title: 'Impostazioni',
+    subtitle: 'Configura le preferenze',
+    theme: 'Tema',
+    themeDescription: 'Seleziona modalità aspetto',
+    themeDark: 'Scuro',
+    themeLight: 'Chiaro',
+    language: 'Lingua',
+    languageDescription: 'Seleziona lingua di visualizzazione',
+    clearData: 'Cancella Tutti i Dati',
+    clearDataDescription: 'Elimina tutti i giri salvati dal browser',
+    clearButton: 'Cancella',
+    confirmClear: 'Eliminare tutti i giri salvati? Questa azione non può essere annullata.',
+    dataCleared: 'Tutti i dati cancellati.',
+    clearFailed: 'Impossibile cancellare i dati.',
+    chartColors: 'Colori Grafico',
+    chartColorsDescription: 'Personalizza colori linee grafico',
+    color1: 'Colore Pilota 1',
+    color2: 'Colore Pilota 2',
+    dataManagement: 'Gestione Dati',
+    dataManagementDescription: 'Esporta o importa i tuoi dati (giri e impostazioni)',
+    export: 'Esporta',
+    import: 'Importa',
+    importConfirmTitle: 'Importa Dati',
+    importConfirmBody: 'Sei sicuro di voler importare i dati? Questo sovrascriverà tutti i giri e le impostazioni attuali. Questa azione non può essere annullata.',
+    exportSuccess: 'Dati esportati con successo',
+    importSuccess: 'Dati importati con successo. La pagina verrà ricaricata.',
+    importError: 'Errore durante l\'importazione dei dati',
+  },
+
+  // Common
+  common: {
+    download: 'Scarica',
+    save: 'Salva',
+    confirm: 'Conferma',
+    cancel: 'Annulla',
+    delete: 'Elimina',
+    edit: 'Modifica',
+    unknown: 'Sconosciuto',
+    success: 'Successo',
+    error: 'Errore',
+    loading: 'Caricamento...',
+  },
+};

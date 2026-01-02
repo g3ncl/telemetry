@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(wc:*)",
+      "Bash(npm run build:*)",
+      "WebFetch(domain:github.com)",
+      "Bash(npm uninstall:*)",
+      "Bash(find:*)",
+      "Bash(npx next build:*)",
+      "Bash(npm outdated:*)",
+      "Bash(npm audit)",
+      "Bash(npx eslint:*)",
+      "Bash(npm audit fix:*)"
+    ]
+  }
+}

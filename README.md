@@ -1,36 +1,80 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Kart Telemetry
 
-## Getting Started
+A web application for extracting, visualizing, and analyzing GPS telemetry data from GoPro video files and standard telemetry formats.
 
-First, run the development server:
+## Description
+
+This project processes telemetry data locally in the browser. It extracts GPS streams (GoPro MET) from MP4 files or parses GPX/GeoJSON/CSV files to identify tracks, split data into laps, and compare performance between different sessions.
+
+## Features
+
+- **Local Processing:** Extracts telemetry from MP4 files using FFmpeg.wasm entirely within the browser.
+- **Multi-Format Support:** Supports MP4 (GoPro), GPX, GeoJSON, and CSV (AiM format) files.
+- **Lap Detection:** Automatically identifies tracks and splits continuous telemetry data into individual laps.
+- **Analysis:** Compares two selected laps, visualizing speed and time delta (gap) over distance.
+- **Data Persistence:** Stores extracted laps locally using IndexedDB.
+- **Export:** Allows downloading extracted lap data as GeoJSON and analysis charts as PNG images.
+- **Data Backup:** Export and import all data (laps and settings) for backup or transfer.
+- **Multilingual:** Supports English and Italian.
+
+## Requirements
+
+- Modern browser with WebAssembly support (Chrome, Firefox, Edge, Safari)
+- IndexedDB support for local data storage
+
+## Installation
+
+1. Clone the repository.
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Download FFmpeg WASM core files and place them in the `public/` directory:
+   - `ffmpeg-core.js`
+   - `ffmpeg-core.wasm`
+
+4. Run the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Build
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+```bash
+npm run build
+npm run start
+```
 
-## Learn More
+## Usage
 
-To learn more about Next.js, take a look at the following resources:
+1. **Extract:** Navigate to the "Extract" section and upload an MP4, GPX, GeoJSON, or CSV file. The app will process the file and display detected laps.
+2. **Save:** Enter a driver name and select laps to save them to the local database.
+3. **Analyze:** Go to the "Analyze" section. Select two saved laps from the same track to compare their speed profiles and time deltas.
+4. **Export:** Use the download button to save the comparison chart as a PNG image.
+5. **Settings:** Configure theme, language, chart colors, and manage data backups.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Technology Stack
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+- **Framework:** Next.js 16 (App Router)
+- **Language:** TypeScript
+- **UI:** Mantine v8, Lucide React
+- **Processing:** @ffmpeg/ffmpeg (WASM), gopro-telemetry, ffprobe-wasm
+- **Visualization:** Chart.js, React-Chartjs-2
+- **Storage:** IndexedDB (idb)
 
-## Deploy on Vercel
+## Supported Tracks
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The application currently supports the following tracks:
+- Tito
+- Salandra
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+To add a new track, edit `src/utils/tracks.ts` and add the finish line coordinates.
+
+## License
+
+Private

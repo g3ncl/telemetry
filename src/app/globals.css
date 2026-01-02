@@ -1,19 +1,12 @@
 :root {
-  --primary-color: rgb(252 70 100);
-  --secondary-color: rgb(240 240 240);
-  --background-color: rgb(34 34 34);
-  --text-color: rgb(240 240 240);
+  --sidebar-width: 220px;
+  --bottom-nav-height: 60px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    --background-color: rgb(240 240 240);
-    --text-color: rgb(34 34 34);
-    --secondary-color: rgb(34 34 34);
-  }
+* {
+  box-sizing: border-box;
 }
 
-html {
-  background-color: var(--background-color);
-  color: var(--text-color);
+body {
+  min-height: 100dvh;
 }
