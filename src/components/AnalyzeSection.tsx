@@ -52,14 +52,27 @@ interface ProcessedLapData {
 const processLapData = (lap: SavedLap): ProcessedLapData => {
   const coords = lap.data.geometry.coordinates;
   const timestamps = lap.data.properties.AbsoluteUtcMicroSec;
+  const isCalculated = lap.data.properties.device === 'Alfano (Calculated)';
+  
   const distances: number[] = [0];
   const speeds: number[] = [];
   const times: number[] = [0];
   let cumulativeDistance = 0;
 
   for (let i = 1; i < coords.length; i++) {
-    const dist = haversineDistance(coords[i - 1][1], coords[i - 1][0], coords[i][1], coords[i][0]);
-    cumulativeDistance += dist;
+    let dist: number;
+    
+    if (isCalculated) {
+      // For calculated tracks, the first coordinate IS the cumulative distance in meters
+      // coords[i] is [distance, 0, 0]
+      // The distance for this segment is just the difference in the X coordinate
+      dist = coords[i][0] - coords[i - 1][0];
+      cumulativeDistance = coords[i][0];
+    } else {
+      dist = haversineDistance(coords[i - 1][1], coords[i - 1][0], coords[i][1], coords[i][0]);
+      cumulativeDistance += dist;
+    }
+    
     distances.push(cumulativeDistance);
     const timeDiff = (timestamps[i] - timestamps[i - 1]) / 1000000;
     times.push((timestamps[i] - timestamps[0]) / 1000000);
@@ -453,7 +466,7 @@ const AnalyzeSection: React.FC = () => {
           labels: chartData.map((d) => d.distance),
           datasets: [
             {
-              label: lap1?.driverName || t.analyze.driver1,
+              label: lap1 ? `${lap1.driverName || t.analyze.driver1} - ${formatLapTime(lap1.lapTime)}` : t.analyze.driver1,
               data: chartData.map((d) => d.speed1),
               borderColor: chartColors.driver1,
               backgroundColor: chartColors.driver1 + '20',
@@ -465,7 +478,7 @@ const AnalyzeSection: React.FC = () => {
               borderJoinStyle: 'round' as const,
             },
             {
-              label: lap2?.driverName || t.analyze.driver2,
+              label: lap2 ? `${lap2.driverName || t.analyze.driver2} - ${formatLapTime(lap2.lapTime)}` : t.analyze.driver2,
               data: chartData.map((d) => d.speed2),
               borderColor: chartColors.driver2,
               backgroundColor: chartColors.driver2 + '20',

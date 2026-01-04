@@ -1,16 +1,18 @@
 import { TRACK_DETECTION_THRESHOLD_METERS } from '@/constants';
 import { haversineDistance } from '@/lib/utils';
-import type { GeoJSON, Track } from '@/types/types';
+import type { GeoJSON, SavedTrack, Track } from '@/types/types';
 
 // Track definitions with names and finish line coordinates
 export const tracks: Track[] = [
   {
     name: 'Tito',
+    length: 424,
     fLStart: [15.724561, 40.597828],
     fLEnd: [15.724723, 40.59782],
   },
   {
     name: 'Salandra',
+    length: 915,
     fLStart: [16.311973832554074, 40.56100840695992],
     fLEnd: [16.311696223947372, 40.56096408671552],
   },
@@ -45,11 +47,13 @@ const getAverageCoordinate = (data: GeoJSON): [number, number] => {
 /**
  * Detect track from GPS data.
  * @param data GeoJSON telemetry data
+ * @param availableTracks List of tracks to check against
  * @param thresholdMeters Maximum distance in meters to consider a match
  * @returns Track index or -1 if no track found within threshold
  */
 export const detectTrack = (
   data: GeoJSON,
+  availableTracks: (Track | SavedTrack)[],
   thresholdMeters: number = TRACK_DETECTION_THRESHOLD_METERS
 ): number => {
   const avgCoord = getAverageCoordinate(data);
@@ -57,8 +61,12 @@ export const detectTrack = (
   let closestIndex = -1;
   let closestDistance = Infinity;
 
-  for (let i = 0; i < tracks.length; i++) {
-    const trackCenter = getTrackCenter(tracks[i]);
+  for (let i = 0; i < availableTracks.length; i++) {
+    const track = availableTracks[i];
+    // Skip tracks without coordinates
+    if (!track.fLStart || !track.fLEnd) continue;
+
+    const trackCenter = getTrackCenter(track as Track);
     // Note: haversineDistance expects (lat1, lon1, lat2, lon2)
     // avgCoord and trackCenter are [lon, lat]
     const distance = haversineDistance(

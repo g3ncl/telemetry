@@ -43,7 +43,7 @@ const Sidebar: React.FC = () => {
             key={item.id}
             component={Link}
             href={`/${locale}${item.path}`}
-            label={t.nav[item.labelKey]}
+            label={t.nav[item.labelKey as keyof typeof t.nav]}
             leftSection={item.icon}
             active={isActive(item.path)}
             variant="filled"
@@ -62,7 +62,7 @@ const Sidebar: React.FC = () => {
         <NavLink
           component={Link}
           href={`/${locale}${settingsNavItem.path}`}
-          label={t.nav[settingsNavItem.labelKey]}
+          label={t.nav[settingsNavItem.labelKey as keyof typeof t.nav]}
           leftSection={settingsNavItem.icon}
           active={isActive(settingsNavItem.path)}
           variant="filled"

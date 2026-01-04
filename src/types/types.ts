@@ -39,14 +39,28 @@ export interface SavedLap {
 /** Track definition with finish line coordinates */
 export interface Track {
   name: string;
+  length: number;
   /** Finish line start point [lon, lat] */
   fLStart: [number, number];
   /** Finish line end point [lon, lat] */
   fLEnd: [number, number];
 }
 
+/** A track saved in the database for reference (especially for non-GPS telemetry) */
+export interface SavedTrack {
+  id: string;
+  name: string;
+  length: number; // in meters
+  fLStart?: [number, number];
+  fLEnd?: [number, number];
+  notes?: string;
+  isSystem?: boolean;
+  createdAt: number;
+  updatedAt: number;
+}
+
 /** Navigation section identifiers */
-export type Section = 'extract' | 'saved' | 'analyze' | 'settings';
+export type Section = 'extract' | 'saved' | 'analyze' | 'settings' | 'tracks';
 
 /** Navigation item configuration */
 export interface NavItem {

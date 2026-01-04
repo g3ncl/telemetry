@@ -1,6 +1,5 @@
 import { INTERPOLATION_FACTOR, MICROSECONDS_PER_MILLISECOND } from '@/constants';
-import type { GeoJSON, Lap, Point } from '@/types/types';
-import { tracks } from './tracks';
+import type { GeoJSON, Lap, Point, Track, SavedTrack } from '@/types/types';
 
 /**
  * Interpolate GPS coordinates to increase temporal resolution.
@@ -95,10 +94,12 @@ const onSegment = (
 const crossedTheFinishLine = (
   point: [number, number],
   previousPoint: [number, number],
-  trackIndex: number = 0
+  track: Track | SavedTrack
 ): boolean => {
-  const fLStart = tracks[trackIndex].fLStart;
-  const fLEnd = tracks[trackIndex].fLEnd;
+  if (!track.fLStart || !track.fLEnd) return false;
+
+  const fLStart = track.fLStart;
+  const fLEnd = track.fLEnd;
 
   // Check if two segments intersect
   const o1 = orientation(previousPoint, point, fLStart);
@@ -121,10 +122,10 @@ const crossedTheFinishLine = (
 /**
  * Split telemetry data into individual laps based on finish line crossings.
  * @param data GeoJSON telemetry data
- * @param trackIndex Index of the track to use for finish line detection
+ * @param track Track object to use for finish line detection
  * @returns Array of Lap objects
  */
-const splitTelemetryByLaps = (data: GeoJSON, trackIndex: number = 0): Lap[] => {
+const splitTelemetryByLaps = (data: GeoJSON, track: Track | SavedTrack): Lap[] => {
   try {
     const interpolatedData = interpolateGeoJSON(data);
     const laps: Lap[] = [];
@@ -154,7 +155,7 @@ const splitTelemetryByLaps = (data: GeoJSON, trackIndex: number = 0): Lap[] => {
         crossedTheFinishLine(
           [point[0], point[1]],
           [coordinates[i - 1][0], coordinates[i - 1][1]],
-          trackIndex
+          track
         )
       ) {
         // Don't save first segment (incomplete lap before first crossing)
@@ -195,3 +196,4 @@ const splitTelemetryByLaps = (data: GeoJSON, trackIndex: number = 0): Lap[] => {
 };
 
 export default splitTelemetryByLaps;
+

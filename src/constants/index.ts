@@ -22,7 +22,7 @@ export const MILLISECONDS_PER_SECOND = 1000;
 export const SECONDS_PER_MINUTE = 60;
 
 // File types
-export type FileType = 'mp4' | 'gpx' | 'geojson' | 'csv';
+export type FileType = 'mp4' | 'gpx' | 'geojson' | 'csv' | 'zip';
 
 // Locales
 export const SUPPORTED_LOCALES = ['en', 'it'] as const;

@@ -11,6 +11,26 @@ export const it: TranslationKeys = {
     savedLaps: 'Giri Salvati',
     analyze: 'Analizza',
     settings: 'Impostazioni',
+    tracks: 'Circuiti',
+  },
+
+  // Tracks Section
+  tracks: {
+    title: 'Gestione Circuiti',
+    subtitle: 'Gestisci dettagli e lunghezze dei circuiti',
+    noTracks: 'Nessun circuito trovato. Creane uno per iniziare.',
+    addTrack: 'Aggiungi Circuito',
+    editTrack: 'Modifica Circuito',
+    deleteTrack: 'Elimina Circuito',
+    name: 'Nome Circuito',
+    length: 'Lunghezza (m)',
+    notes: 'Note',
+    confirmDelete: 'Eliminare questo circuito? I giri associati non verranno eliminati.',
+    createSuccess: 'Circuito creato con successo',
+    updateSuccess: 'Circuito aggiornato con successo',
+    deleteSuccess: 'Circuito eliminato con successo',
+    nameRequired: 'Il nome del circuito è obbligatorio',
+    lengthRequired: 'La lunghezza del circuito è obbligatoria',
   },
 
   // Extract Section
@@ -33,9 +53,16 @@ export const it: TranslationKeys = {
     lap: 'Giro',
     time: 'Tempo',
     noLapsFound: 'Nessun giro trovato. Assicurati di aver attraversato il traguardo.',
-    unsupportedFileType: 'Tipo di file non supportato. Usa MP4, GPX, GeoJSON o CSV.',
+    unsupportedFileType: 'Tipo di file non supportato. Usa MP4, GPX, GeoJSON, CSV o Alfano ZIP.',
     couldNotDetectTrack:
       'Impossibile rilevare il circuito. I dati GPS non sono entro 2km da nessun circuito conosciuto. Usa le Impostazioni Avanzate per selezionare manualmente.',
+    alfanoTitle: 'Importazione Alfano',
+    alfanoSubtitle: 'GPS non rilevato. Configura i parametri per calcolare velocità e distanza.',
+    alfanoDisclaimer: 'Nota: Velocità e distanza sono calcolate in base a RPM e rapporto. I dati sono un\'approssimazione e potrebbero non essere precisi a causa di slittamenti e traiettorie.',
+    pignone: 'Pignone',
+    corona: 'Corona',
+    wheelCircumference: 'Circonferenza Ruota (m)',
+    selectTrack: 'Seleziona Circuito (per calibrazione lunghezza)',
   },
 
   // Saved Laps Section

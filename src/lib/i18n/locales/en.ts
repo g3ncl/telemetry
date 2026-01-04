@@ -7,6 +7,24 @@ export interface TranslationKeys {
     savedLaps: string;
     analyze: string;
     settings: string;
+    tracks: string;
+  };
+  tracks: {
+    title: string;
+    subtitle: string;
+    noTracks: string;
+    addTrack: string;
+    editTrack: string;
+    deleteTrack: string;
+    name: string;
+    length: string;
+    notes: string;
+    confirmDelete: string;
+    createSuccess: string;
+    updateSuccess: string;
+    deleteSuccess: string;
+    nameRequired: string;
+    lengthRequired: string;
   };
   extract: {
     title: string;
@@ -29,6 +47,13 @@ export interface TranslationKeys {
     noLapsFound: string;
     unsupportedFileType: string;
     couldNotDetectTrack: string;
+    alfanoTitle: string;
+    alfanoSubtitle: string;
+    alfanoDisclaimer: string;
+    pignone: string;
+    corona: string;
+    wheelCircumference: string;
+    selectTrack: string;
   };
   saved: {
     title: string;
@@ -113,6 +138,26 @@ export const en: TranslationKeys = {
     savedLaps: 'Saved Laps',
     analyze: 'Analyze',
     settings: 'Settings',
+    tracks: 'Tracks',
+  },
+
+  // Tracks Section
+  tracks: {
+    title: 'Track Manager',
+    subtitle: 'Manage track details and reference lengths',
+    noTracks: 'No tracks found. Create one to get started.',
+    addTrack: 'Add Track',
+    editTrack: 'Edit Track',
+    deleteTrack: 'Delete Track',
+    name: 'Track Name',
+    length: 'Length (m)',
+    notes: 'Notes',
+    confirmDelete: 'Delete this track? This will not delete associated laps.',
+    createSuccess: 'Track created successfully',
+    updateSuccess: 'Track updated successfully',
+    deleteSuccess: 'Track deleted successfully',
+    nameRequired: 'Track name is required',
+    lengthRequired: 'Track length is required',
   },
 
   // Extract Section
@@ -135,9 +180,16 @@ export const en: TranslationKeys = {
     lap: 'Lap',
     time: 'Time',
     noLapsFound: 'No laps found. Make sure you crossed the finish line.',
-    unsupportedFileType: 'Unsupported file type. Use MP4, GPX, GeoJSON, or CSV.',
+    unsupportedFileType: 'Unsupported file type. Use MP4, GPX, GeoJSON, CSV or Alfano ZIP.',
     couldNotDetectTrack:
       'Could not detect track. GPS data is not within 2km of known track. Use Advanced Settings to manually select a track.',
+    alfanoTitle: 'Alfano Import',
+    alfanoSubtitle: 'No GPS detected. Configure parameters to calculate speed and distance.',
+    alfanoDisclaimer: 'Note: Speed and distance are calculated based on RPM and gear ratio. This data is an approximation and may not be precise due to wheel spin and line variations.',
+    pignone: 'Engine Sprocket',
+    corona: 'Rear Sprocket',
+    wheelCircumference: 'Wheel Circumference (m)',
+    selectTrack: 'Select Track (for length calibration)',
   },
 
   // Saved Laps Section

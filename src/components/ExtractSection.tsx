@@ -6,7 +6,6 @@ import { saveLap } from '@/lib/db';
 import { useI18n } from '@/lib/i18n';
 import { downloadFile, formatLapTime, formatTimestamp } from '@/lib/utils';
 import type { Lap } from '@/types/types';
-import { getTrackNames } from '@/utils/tracks';
 import {
   Alert,
   Box,
@@ -14,6 +13,8 @@ import {
   Checkbox,
   Collapse,
   Group,
+  Modal,
+  NumberInput,
   Paper,
   Progress,
   Select,
@@ -41,6 +42,10 @@ const ExtractSection: React.FC = () => {
     setShowAdvanced,
     processFile,
     getLoadingText,
+    tracks,
+    pendingAlfanoFile,
+    setPendingAlfanoFile,
+    processAlfano,
   } = useTelemetryExtraction();
 
   const [driverName, setDriverName] = useState<string>('');
@@ -48,8 +53,27 @@ const ExtractSection: React.FC = () => {
   const [selectedLapNumbers, setSelectedLapNumbers] = useState<number[]>([]);
   const [saveError, setSaveError] = useState<string>('');
 
+  // Alfano Parameters state
+  const [pignone, setPignone] = useState<number | ''>(12);
+  const [corona, setCorona] = useState<number | ''>(82);
+  const [circonferenza, setCirconferenza] = useState<number | ''>(0.84);
+  const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const trackNames = getTrackNames();
+  const trackNames = tracks.map(t => t.name);
+
+  const handleAlfanoSubmit = async () => {
+    if (!selectedTrackId) return;
+    const track = tracks.find(t => t.id === selectedTrackId);
+    if (!track) return;
+
+    await processAlfano({
+      pignone: Number(pignone),
+      corona: Number(corona),
+      circonferenza: Number(circonferenza),
+      track,
+    });
+  };
 
   const handleFileSelect = async () => {
     if (window.showOpenFilePicker) {
@@ -63,6 +87,7 @@ const ExtractSection: React.FC = () => {
                 'application/gpx+xml': ['.gpx'],
                 'application/geo+json': ['.geojson'],
                 'application/csv': ['.csv'],
+                'application/zip': ['.zip'],
               },
             },
           ],
@@ -187,7 +212,7 @@ const ExtractSection: React.FC = () => {
           type="file"
           ref={fileInputRef}
           style={{ display: 'none' }}
-          accept=".mp4,.gpx,.geojson,.json,.csv"
+          accept=".mp4,.gpx,.geojson,.json,.csv,.zip"
           onChange={handleFileChange}
         />
 
@@ -308,8 +333,64 @@ const ExtractSection: React.FC = () => {
             </Paper>
           ))}
       </Stack>
+
+      {/* Alfano Import Modal */}
+      <Modal
+        opened={!!pendingAlfanoFile}
+        onClose={() => setPendingAlfanoFile(null)}
+        title={t.extract.alfanoTitle}
+        centered
+      >
+        <Stack>
+          <Text size="sm" c="dimmed">
+            {t.extract.alfanoSubtitle}
+          </Text>
+          <Alert color="yellow" title="Disclaimer" variant="light">
+            {t.extract.alfanoDisclaimer}
+          </Alert>
+          <Group grow>
+            <NumberInput
+              label={t.extract.pignone}
+              value={pignone}
+              onChange={(val) => setPignone(val as number | '')}
+              min={1}
+            />
+            <NumberInput
+              label={t.extract.corona}
+              value={corona}
+              onChange={(val) => setCorona(val as number | '')}
+              min={1}
+            />
+          </Group>
+          <NumberInput
+            label={t.extract.wheelCircumference}
+            value={circonferenza}
+            onChange={(val) => setCirconferenza(val as number | '')}
+            min={0}
+            step={0.01}
+            decimalScale={3}
+          />
+          <Select
+            label={t.extract.selectTrack}
+            placeholder={t.analyze.selectPlaceholder}
+            data={tracks.map((t) => ({ value: t.id, label: `${t.name} (${t.length}m)` }))}
+            value={selectedTrackId}
+            onChange={setSelectedTrackId}
+            required
+          />
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={() => setPendingAlfanoFile(null)}>
+              {t.common.cancel}
+            </Button>
+            <Button onClick={handleAlfanoSubmit} disabled={!selectedTrackId}>
+              {t.common.confirm}
+            </Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Box>
   );
 };
 
 export default ExtractSection;
+

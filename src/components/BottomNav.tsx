@@ -48,7 +48,7 @@ const BottomNav: React.FC = () => {
                 {item.icon}
               </ActionIcon>
               <Text size="xs" c={active ? 'var(--mantine-color-text)' : 'dimmed'} mt={2} fw={500}>
-                {t.nav[item.labelKey]}
+                {t.nav[item.labelKey as keyof typeof t.nav]}
               </Text>
             </Box>
           );

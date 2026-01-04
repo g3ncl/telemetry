@@ -1,13 +1,15 @@
 import { FileType, TRACK_DETECTION_THRESHOLD_METERS } from '@/constants';
 import { useI18n } from '@/lib/i18n';
 import { getFileExtension } from '@/lib/utils';
+import type { GeoJSON, Lap } from '@/types/types';
+import { processAlfanoZip, type AlfanoParams } from '@/utils/alfano';
+import { convertCsvToGeoJson } from '@/utils/csvToGeoJson';
 import extractTelemetry from '@/utils/extract';
 import { convertGpxToGeoJson } from '@/utils/gpxToGeoJson';
-import { convertCsvToGeoJson } from '@/utils/csvToGeoJson';
 import splitTelemetryByLaps from '@/utils/splitLaps';
-import { detectTrack, tracks } from '@/utils/tracks';
-import type { GeoJSON, Lap } from '@/types/types';
+import { detectTrack } from '@/utils/tracks';
 import { useState } from 'react';
+import { useTracks } from './useTracks';
 
 const getFileType = (filename: string): FileType | null => {
   const ext = getFileExtension(filename);
@@ -21,6 +23,8 @@ const getFileType = (filename: string): FileType | null => {
       return 'geojson';
     case 'csv':
       return 'csv';
+    case 'zip':
+      return 'zip';
     default:
       return null;
   }
@@ -28,6 +32,7 @@ const getFileType = (filename: string): FileType | null => {
 
 export const useTelemetryExtraction = () => {
   const { t } = useI18n();
+  const { tracks } = useTracks();
   const [loading, setLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [error, setError] = useState<string>('');
@@ -36,6 +41,7 @@ export const useTelemetryExtraction = () => {
   const [detectedTrackName, setDetectedTrackName] = useState<string>('');
   const [fileType, setFileType] = useState<FileType | null>(null);
   const [showAdvanced, setShowAdvanced] = useState(false);
+  const [pendingAlfanoFile, setPendingAlfanoFile] = useState<File | null>(null);
 
   const progressFunction = (prog: number) => {
     setProgress(prog * 100);
@@ -53,10 +59,33 @@ export const useTelemetryExtraction = () => {
     setProgress(0);
   };
 
+  const processAlfano = async (params: AlfanoParams) => {
+    if (!pendingAlfanoFile) return;
+    setLoading(true);
+    setError('');
+    setProgress(20);
+    try {
+      const extractedLaps = await processAlfanoZip(pendingAlfanoFile, params);
+      setLaps(extractedLaps);
+      setDetectedTrackName(params.track.name);
+      setPendingAlfanoFile(null);
+      setLoading(false);
+      setProgress(0);
+    } catch (err) {
+      handleError(err);
+    }
+  };
+
   const processFile = async (file: File) => {
     const detectedType = getFileType(file.name);
     if (!detectedType) {
       setError(t.extract.unsupportedFileType);
+      return;
+    }
+
+    if (detectedType === 'zip') {
+      setPendingAlfanoFile(file);
+      setFileType('zip');
       return;
     }
 
@@ -99,8 +128,10 @@ export const useTelemetryExtraction = () => {
       }
 
       let trackIndex = selectedTrackIndex !== null ? parseInt(selectedTrackIndex) : null;
-      if (trackIndex === null) {
-        trackIndex = detectTrack(data, TRACK_DETECTION_THRESHOLD_METERS);
+      let selectedTrack = trackIndex !== null ? tracks[trackIndex] : null;
+
+      if (!selectedTrack) {
+        trackIndex = detectTrack(data, tracks, TRACK_DETECTION_THRESHOLD_METERS);
         if (trackIndex === -1) {
           setError(t.extract.couldNotDetectTrack);
           setLoading(false);
@@ -108,10 +139,17 @@ export const useTelemetryExtraction = () => {
           setShowAdvanced(true);
           return;
         }
-        setDetectedTrackName(tracks[trackIndex].name);
+        selectedTrack = tracks[trackIndex];
+        setDetectedTrackName(selectedTrack.name);
       }
 
-      const extractedLaps: Lap[] = splitTelemetryByLaps(data, trackIndex);
+      if (!selectedTrack) {
+         setError('Track selection failed');
+         setLoading(false);
+         return;
+      }
+
+      const extractedLaps: Lap[] = splitTelemetryByLaps(data, selectedTrack);
       setLaps(extractedLaps);
       setLoading(false);
       setProgress(0);
@@ -131,6 +169,8 @@ export const useTelemetryExtraction = () => {
         return t.extract.parsingGeojson;
       case 'csv':
         return t.extract.parsingCsv;
+      case 'zip':
+        return t.extract.processing;
     }
   };
 
@@ -148,5 +188,9 @@ export const useTelemetryExtraction = () => {
     processFile,
     getLoadingText,
     setError,
+    tracks,
+    pendingAlfanoFile,
+    setPendingAlfanoFile,
+    processAlfano,
   };
 };
