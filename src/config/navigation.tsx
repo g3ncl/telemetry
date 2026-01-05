@@ -1,5 +1,5 @@
 import type { NavItem } from '@/types/types';
-import { BarChart3, FileInput, Map, Save, Settings } from 'lucide-react';
+import { BarChart3, FileInput, Save, Settings } from 'lucide-react';
 
 export const navItems: (NavItem & { path: string })[] = [
   {
@@ -21,12 +21,6 @@ export const navItems: (NavItem & { path: string })[] = [
     path: '/analyze',
   },
   {
-    id: 'tracks',
-    labelKey: 'tracks',
-    icon: <Map size={20} />,
-    path: '/tracks',
-  },
-  {
     id: 'settings',
     labelKey: 'settings',
     icon: <Settings size={20} />,
@@ -34,6 +28,5 @@ export const navItems: (NavItem & { path: string })[] = [
   },
 ];
 
-export const mainNavItems = navItems.slice(0, 4);
-export const settingsNavItem = navItems[4];
-
+export const mainNavItems = navItems.slice(0, 3);
+export const settingsNavItem = navItems[3];

@@ -1,6 +1,6 @@
 'use client';
 
-import { MICROSECONDS_PER_MILLISECOND } from '@/constants';
+import { DEFAULT_ALFANO_FRONT_SPROCKET, DEFAULT_ALFANO_REAR_SPROCKET, DEFAULT_ALFANO_WHEEL_CIRCUMFERENCE, MICROSECONDS_PER_MILLISECOND } from '@/constants';
 import { useTelemetryExtraction } from '@/hooks/useTelemetryExtraction';
 import { saveLap } from '@/lib/db';
 import { useI18n } from '@/lib/i18n';
@@ -26,7 +26,7 @@ import {
   UnstyledButton,
 } from '@mantine/core';
 import { Download, Flag, Search } from 'lucide-react';
-import React, { ChangeEvent, useRef, useState } from 'react';
+import React, { ChangeEvent, useMemo, useRef, useState } from 'react';
 
 const ExtractSection: React.FC = () => {
   const { t } = useI18n();
@@ -54,13 +54,19 @@ const ExtractSection: React.FC = () => {
   const [saveError, setSaveError] = useState<string>('');
 
   // Alfano Parameters state
-  const [pignone, setPignone] = useState<number | ''>(12);
-  const [corona, setCorona] = useState<number | ''>(82);
-  const [circonferenza, setCirconferenza] = useState<number | ''>(0.84);
+  const [frontSprocket, setFrontSprocket] = useState<number | ''>(DEFAULT_ALFANO_FRONT_SPROCKET);
+  const [rearSprocket, setRearSprocket] = useState<number | ''>(DEFAULT_ALFANO_REAR_SPROCKET);
+  const [wheelCircumference, setWheelCircumference] = useState<number | ''>(DEFAULT_ALFANO_WHEEL_CIRCUMFERENCE);
   const [selectedTrackId, setSelectedTrackId] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const trackNames = tracks.map(t => t.name);
+  
+  // Memoize track options to prevent unnecessary re-renders
+  const trackOptions = useMemo(() => 
+    tracks.map((t) => ({ value: t.id, label: `${t.name} (${t.length}m)` })),
+    [tracks]
+  );
 
   const handleAlfanoSubmit = async () => {
     if (!selectedTrackId) return;
@@ -68,9 +74,9 @@ const ExtractSection: React.FC = () => {
     if (!track) return;
 
     await processAlfano({
-      pignone: Number(pignone),
-      corona: Number(corona),
-      circonferenza: Number(circonferenza),
+      frontSprocket: Number(frontSprocket),
+      rearSprocket: Number(rearSprocket),
+      wheelCircumference: Number(wheelCircumference),
       track,
     });
   };
@@ -350,22 +356,22 @@ const ExtractSection: React.FC = () => {
           </Alert>
           <Group grow>
             <NumberInput
-              label={t.extract.pignone}
-              value={pignone}
-              onChange={(val) => setPignone(val as number | '')}
+              label={t.extract.frontSprocket}
+              value={frontSprocket}
+              onChange={(val) => setFrontSprocket(val as number | '')}
               min={1}
             />
             <NumberInput
-              label={t.extract.corona}
-              value={corona}
-              onChange={(val) => setCorona(val as number | '')}
+              label={t.extract.rearSprocket}
+              value={rearSprocket}
+              onChange={(val) => setRearSprocket(val as number | '')}
               min={1}
             />
           </Group>
           <NumberInput
             label={t.extract.wheelCircumference}
-            value={circonferenza}
-            onChange={(val) => setCirconferenza(val as number | '')}
+            value={wheelCircumference}
+            onChange={(val) => setWheelCircumference(val as number | '')}
             min={0}
             step={0.01}
             decimalScale={3}
@@ -373,10 +379,11 @@ const ExtractSection: React.FC = () => {
           <Select
             label={t.extract.selectTrack}
             placeholder={t.analyze.selectPlaceholder}
-            data={tracks.map((t) => ({ value: t.id, label: `${t.name} (${t.length}m)` }))}
+            data={trackOptions}
             value={selectedTrackId}
             onChange={setSelectedTrackId}
             required
+            comboboxProps={{ withinPortal: false }}
           />
           <Group justify="flex-end" mt="md">
             <Button variant="default" onClick={() => setPendingAlfanoFile(null)}>

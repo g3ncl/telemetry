@@ -211,6 +211,7 @@ const SavedLapsSection: React.FC = () => {
                         <Button
                           size="compact-xs"
                           variant="subtle"
+                          color="blue"
                           onClick={() => handleDownloadLap(lap)}
                         >
                           <Download size={14} />
@@ -218,7 +219,6 @@ const SavedLapsSection: React.FC = () => {
                         <Button
                           size="compact-xs"
                           variant="subtle"
-                          color="red"
                           onClick={() => handleConfirmDelete(lap.id)}
                         >
                           <Trash2 size={14} />
@@ -248,7 +248,7 @@ const SavedLapsSection: React.FC = () => {
             <Button variant="default" onClick={closeDeleteModal}>
               {t.common.cancel}
             </Button>
-            <Button color="red" onClick={handleDelete}>
+            <Button onClick={handleDelete}>
               {t.common.delete}
             </Button>
           </Group>

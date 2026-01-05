@@ -1,25 +1,34 @@
 import { DEFAULT_CHART_COLORS, SUPPORTED_LOCALES } from '@/constants';
+import { useTracks } from '@/hooks/useTracks';
 import { clearAllLaps, getAllLaps, importLaps } from '@/lib/db';
 import { localeNames, useI18n, type Locale } from '@/lib/i18n';
 import { downloadFile } from '@/lib/utils';
-import type { SavedLap } from '@/types/types';
+import type { SavedLap, SavedTrack } from '@/types/types';
 import {
+    ActionIcon,
+    Badge,
     Box,
     Button,
+    Card,
     ColorInput,
     Divider,
     Group,
     Modal,
+    NumberInput,
     Paper,
     Select,
+    SimpleGrid,
+    Skeleton,
     Stack,
     Text,
+    Textarea,
+    TextInput,
     Title,
     useMantineColorScheme
 } from '@mantine/core';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
-import { ArrowDownToLine, ArrowUpFromLine, Trash2 } from 'lucide-react';
+import { ArrowDownToLine, ArrowUpFromLine, Pencil, Plus, Trash2 } from 'lucide-react';
 import React, { useRef, useState } from 'react';
 
 interface ImportData {
@@ -35,6 +44,20 @@ interface ImportData {
 const SettingsSection: React.FC = () => {
   const { colorScheme, setColorScheme } = useMantineColorScheme();
   const { locale, setLocale, t } = useI18n();
+  
+  // Tracks State
+  const { tracks, loading: tracksLoading, addOrUpdateTrack, removeTrack } = useTracks();
+  const [trackModalOpened, { open: openTrackModal, close: closeTrackModal }] = useDisclosure(false);
+  const [editingTrack, setEditingTrack] = useState<SavedTrack | null>(null);
+  
+  // Track Form State
+  const [trackName, setTrackName] = useState('');
+  const [trackLength, setTrackLength] = useState<number | ''>('');
+  const [trackNotes, setTrackNotes] = useState('');
+  const [trackFLStart, setTrackFLStart] = useState('');
+  const [trackFLEnd, setTrackFLEnd] = useState('');
+
+  // Settings State
   const [clearing, setClearing] = useState(false);
   const [exporting, setExporting] = useState(false);
   const [importing, setImporting] = useState(false);
@@ -49,6 +72,99 @@ const SettingsSection: React.FC = () => {
     key: 'telemetry-chart-colors',
     defaultValue: DEFAULT_CHART_COLORS,
   });
+
+  // Track Handlers
+  const handleOpenTrackModal = (track?: SavedTrack) => {
+    if (track) {
+      setEditingTrack(track);
+      setTrackName(track.name);
+      setTrackLength(track.length);
+      setTrackNotes(track.notes || '');
+      setTrackFLStart(track.fLStart ? `${track.fLStart[0]}, ${track.fLStart[1]}` : '');
+      setTrackFLEnd(track.fLEnd ? `${track.fLEnd[0]}, ${track.fLEnd[1]}` : '');
+    } else {
+      setEditingTrack(null);
+      setTrackName('');
+      setTrackLength('');
+      setTrackNotes('');
+      setTrackFLStart('');
+      setTrackFLEnd('');
+    }
+    openTrackModal();
+  };
+
+  const handleTrackSubmit = async () => {
+    if (!trackName.trim()) {
+      notifications.show({
+        title: t.common.error,
+        message: t.tracks.nameRequired,
+        color: 'red',
+      });
+      return;
+    }
+    if (!trackLength || trackLength <= 0) {
+      notifications.show({
+        title: t.common.error,
+        message: t.tracks.lengthRequired,
+        color: 'red',
+      });
+      return;
+    }
+    
+    const parseCoords = (input: string): [number, number] | undefined => {
+        const parts = input.split(',').map(s => parseFloat(s.trim()));
+        if (parts.length === 2 && !isNaN(parts[0]) && !isNaN(parts[1])) {
+            return [parts[0], parts[1]];
+        }
+        return undefined;
+    };
+
+    try {
+      await addOrUpdateTrack({
+        id: editingTrack?.id,
+        name: trackName,
+        length: Number(trackLength),
+        notes: trackNotes,
+        fLStart: parseCoords(trackFLStart),
+        fLEnd: parseCoords(trackFLEnd),
+      });
+
+      notifications.show({
+        title: t.common.success,
+        message: editingTrack ? t.tracks.updateSuccess : t.tracks.createSuccess,
+        color: 'green',
+      });
+      closeTrackModal();
+    } catch (error) {
+        console.error(error);
+      notifications.show({
+        title: t.common.error,
+        message: t.common.error,
+        color: 'red',
+      });
+    }
+  };
+
+  const handleTrackDelete = async (id: string, name: string) => {
+    if (window.confirm(t.tracks.confirmDelete)) {
+      try {
+        await removeTrack(id);
+        notifications.show({
+          title: t.common.success,
+          message: t.tracks.deleteSuccess,
+          color: 'green',
+        });
+      } catch (error) {
+        console.error(error);
+        notifications.show({
+          title: t.common.error,
+          message: t.common.error,
+          color: 'red',
+        });
+      }
+    }
+  };
+
 
   const handleClearData = async () => {
     setClearing(true);
@@ -279,6 +395,76 @@ const SettingsSection: React.FC = () => {
             </Group>
 
             <Divider />
+            
+            {/* Track Management */}
+             <Group justify="space-between" align="center" mb="xs">
+               <Box>
+                  <Text fw={600} size="sm">
+                    {t.tracks.title}
+                  </Text>
+                  <Text c="dimmed" size="sm">
+                     {t.tracks.subtitle}
+                  </Text>
+               </Box>
+               <Button variant="light" size='xs' leftSection={<Plus size={14} />} onClick={() => handleOpenTrackModal()}>
+                  {t.tracks.addTrack}
+               </Button>
+            </Group>
+            
+            {tracksLoading ? (
+                 <SimpleGrid cols={1} spacing="xs">
+                    <Skeleton height={60} radius="md" maw={600} />
+                    <Skeleton height={60} radius="md" maw={600} />
+                 </SimpleGrid>
+            ) : tracks.length === 0 ? (
+                 <Text c="dimmed" size="sm" fs="italic" ta="center" py="sm">{t.tracks.noTracks}</Text>
+            ) : (
+                <SimpleGrid cols={1} spacing="xs">
+                    {tracks.map((track) => (
+                      <Card key={track.id} shadow="none" withBorder padding="xs" radius="md" maw={600}>
+                        <Group justify="space-between" wrap="nowrap" align="center">
+                            <Box style={{ flex: 1, minWidth: 0 }}>
+                                <Group gap="xs" wrap="nowrap" mb={2}>
+                                    <Text fw={600} size="sm" lineClamp={1} title={track.name}>
+                                        {track.name}
+                                    </Text>
+                                    {track.isSystem && (
+                                    <Badge variant="dot" color="gray" size="xs">
+                                        System
+                                    </Badge>
+                                    )}
+                                </Group>
+                                <Text size="xs" c="dimmed" lineClamp={1}>
+                                    {track.length}m {track.notes ? `• ${track.notes}` : ''}
+                                </Text>
+                            </Box>
+                            <Group gap={4} wrap="nowrap">
+                                <ActionIcon
+                                    variant="subtle"
+                                    color="blue"
+                                    size="sm"
+                                    onClick={() => handleOpenTrackModal(track)}
+                                    disabled={track.isSystem}
+                                >
+                                <Pencil size={14} />
+                                </ActionIcon>
+                                <ActionIcon
+                                    variant="subtle"
+                                    color="red"
+                                    size="sm"
+                                    onClick={() => handleTrackDelete(track.id, track.name)}
+                                    disabled={track.isSystem}
+                                >
+                                <Trash2 size={14} />
+                                </ActionIcon>
+                            </Group>
+                        </Group>
+                      </Card>
+                    ))}
+                </SimpleGrid>
+            )}
+
+            <Divider />
 
             {/* Data Management */}
             <Group justify="space-between" align="center">
@@ -333,7 +519,6 @@ const SettingsSection: React.FC = () => {
                 </Text>
               </Box>
               <Button
-                color="red"
                 variant="filled"
                 size="sm"
                 leftSection={<Trash2 size={14} />}
@@ -363,7 +548,7 @@ const SettingsSection: React.FC = () => {
             <Button variant="default" onClick={closeConfirmModal} disabled={clearing}>
               {t.common.cancel}
             </Button>
-            <Button color="red" onClick={handleClearData} loading={clearing}>
+            <Button onClick={handleClearData} loading={clearing}>
               {t.common.delete}
             </Button>
           </Group>
@@ -389,6 +574,60 @@ const SettingsSection: React.FC = () => {
             <Button color="red" onClick={handleImportData} loading={importing}>
               {t.common.confirm}
             </Button>
+          </Group>
+        </Stack>
+      </Modal>
+
+      {/* Add/Edit Track Modal */}
+      <Modal
+        opened={trackModalOpened}
+        onClose={closeTrackModal}
+        title={editingTrack ? t.tracks.editTrack : t.tracks.addTrack}
+        centered
+      >
+        <Stack>
+          <TextInput
+            label={t.tracks.name}
+            placeholder="South Garda Karting"
+            required
+            value={trackName}
+            onChange={(event) => setTrackName(event.currentTarget.value)}
+          />
+          <NumberInput
+            label={t.tracks.length}
+            placeholder="1200"
+            required
+            value={trackLength}
+            onChange={(val) => setTrackLength(val as number | '')}
+            min={0}
+            suffix=" m"
+          />
+           <SimpleGrid cols={2}>
+             <TextInput
+               label="Finish Line Start (Lon, Lat)"
+               placeholder="15.123, 40.123"
+               value={trackFLStart}
+               onChange={(event) => setTrackFLStart(event.currentTarget.value)}
+             />
+              <TextInput
+               label="Finish Line End (Lon, Lat)"
+               placeholder="15.123, 40.123"
+               value={trackFLEnd}
+               onChange={(event) => setTrackFLEnd(event.currentTarget.value)}
+             />
+          </SimpleGrid>
+          <Textarea
+            label={t.tracks.notes}
+            placeholder="..."
+            value={trackNotes}
+            onChange={(event) => setTrackNotes(event.currentTarget.value)}
+            minRows={3}
+          />
+          <Group justify="flex-end" mt="md">
+            <Button variant="default" onClick={closeTrackModal}>
+              {t.common.cancel}
+            </Button>
+            <Button onClick={handleTrackSubmit}>{t.common.save}</Button>
           </Group>
         </Stack>
       </Modal>

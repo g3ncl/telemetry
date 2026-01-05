@@ -50,8 +50,8 @@ export interface TranslationKeys {
     alfanoTitle: string;
     alfanoSubtitle: string;
     alfanoDisclaimer: string;
-    pignone: string;
-    corona: string;
+    frontSprocket: string;
+    rearSprocket: string;
     wheelCircumference: string;
     selectTrack: string;
   };
@@ -186,8 +186,8 @@ export const en: TranslationKeys = {
     alfanoTitle: 'Alfano Import',
     alfanoSubtitle: 'No GPS detected. Configure parameters to calculate speed and distance.',
     alfanoDisclaimer: 'Note: Speed and distance are calculated based on RPM and gear ratio. This data is an approximation and may not be precise due to wheel spin and line variations.',
-    pignone: 'Engine Sprocket',
-    corona: 'Rear Sprocket',
+    frontSprocket: 'Engine Sprocket',
+    rearSprocket: 'Rear Sprocket',
     wheelCircumference: 'Wheel Circumference (m)',
     selectTrack: 'Select Track (for length calibration)',
   },

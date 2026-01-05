@@ -1,10 +1,10 @@
-import JSZip from 'jszip';
 import type { GeoJSON, Lap, SavedTrack } from '@/types/types';
+import JSZip from 'jszip';
 
 export interface AlfanoParams {
-  pignone: number;
-  corona: number;
-  circonferenza: number; // in meters
+  frontSprocket: number;
+  rearSprocket: number;
+  wheelCircumference: number; // in meters
   track: SavedTrack;
 }
 
@@ -36,7 +36,7 @@ export const processAlfanoZip = async (
     return numA - numB;
   });
 
-  const ratio = params.corona / params.pignone;
+  const ratio = params.rearSprocket / params.frontSprocket;
 
   for (const fileName of lapFiles) {
     const content = await zip.files[fileName].async('text');
@@ -59,7 +59,7 @@ export const processAlfanoZip = async (
     let totalCalculatedDistance = 0;
     const points = dataPoints.map((dp) => {
       // Speed (m/s) = (RPM / 60) * (1 / Ratio) * Circonferenza
-      const speedMs = (dp.rpm / 60) * (1 / ratio) * params.circonferenza;
+      const speedMs = (dp.rpm / 60) * (1 / ratio) * params.wheelCircumference;
       const dist = speedMs * 0.1;
       totalCalculatedDistance += dist;
       return {

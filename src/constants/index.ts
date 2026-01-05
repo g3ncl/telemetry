@@ -28,3 +28,9 @@ export type FileType = 'mp4' | 'gpx' | 'geojson' | 'csv' | 'zip';
 export const SUPPORTED_LOCALES = ['en', 'it'] as const;
 export type Locale = (typeof SUPPORTED_LOCALES)[number];
 export const DEFAULT_LOCALE: Locale = 'it';
+
+// Default Alfano kart parameters
+export const DEFAULT_ALFANO_FRONT_SPROCKET = 12;
+export const DEFAULT_ALFANO_REAR_SPROCKET = 77;
+export const DEFAULT_ALFANO_WHEEL_CIRCUMFERENCE = 0.88; // meters
+
