@@ -1,14 +1,12 @@
 'use client';
 
 import { DEFAULT_LOCALE, type Locale, SUPPORTED_LOCALES } from '@/constants';
-import { useBasePath } from '@/hooks/useBasePath';
-import { createContext, useCallback, useContext, useEffect, type ReactNode } from 'react';
-import { useRouter, usePathname } from 'next/navigation';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { en, type TranslationKeys } from './locales/en';
 import { it } from './locales/it';
 
-// Locale cookie name
-export const LOCALE_COOKIE_NAME = 'NEXT_LOCALE';
+// Locale storage key
+export const LOCALE_STORAGE_KEY = 'telemetry-locale';
 
 // Translations map
 const translations: Record<Locale, TranslationKeys> = {
@@ -35,53 +33,61 @@ const I18nContext = createContext<I18nContextType | null>(null);
 // Provider props
 interface I18nProviderProps {
   children: ReactNode;
-  locale: Locale;
+}
+
+/**
+ * Get initial locale from localStorage or browser preference
+ */
+function getInitialLocale(): Locale {
+  if (typeof window === 'undefined') {
+    return DEFAULT_LOCALE;
+  }
+
+  // Check localStorage first
+  const stored = localStorage.getItem(LOCALE_STORAGE_KEY);
+  if (stored && SUPPORTED_LOCALES.includes(stored as Locale)) {
+    return stored as Locale;
+  }
+
+  // Fallback to browser language
+  const browserLang = navigator.language.split('-')[0];
+  if (SUPPORTED_LOCALES.includes(browserLang as Locale)) {
+    return browserLang as Locale;
+  }
+
+  return DEFAULT_LOCALE;
 }
 
 // Provider component
-export function I18nProvider({ children, locale }: I18nProviderProps) {
-  const t = translations[locale] ?? translations[DEFAULT_LOCALE];
-  const router = useRouter();
-  const pathname = usePathname();
-  const basePath = useBasePath();
+export function I18nProvider({ children }: I18nProviderProps) {
+  const [locale, setLocaleState] = useState<Locale>(DEFAULT_LOCALE);
+  const [isInitialized, setIsInitialized] = useState(false);
 
-  // Sync localStorage to cookie on mount (in case cookie was cleared but localStorage exists)
+  // Initialize locale from localStorage on mount (client-side only)
   useEffect(() => {
-    const storedLocale = localStorage.getItem(LOCALE_COOKIE_NAME);
-    if (storedLocale && SUPPORTED_LOCALES.includes(storedLocale as Locale)) {
-      // Ensure cookie matches localStorage
-      document.cookie = `${LOCALE_COOKIE_NAME}=${storedLocale};path=/;max-age=31536000`;
-    } else {
-      // Save current locale to localStorage
-      localStorage.setItem(LOCALE_COOKIE_NAME, locale);
-    }
-  }, [locale]);
+    const initialLocale = getInitialLocale();
+    setLocaleState(initialLocale);
+    setIsInitialized(true);
+  }, []);
 
-  // Set locale by navigating and setting cookie + localStorage
-  const setLocale = useCallback(
-    (newLocale: Locale) => {
-      // Set cookie for middleware
-      document.cookie = `${LOCALE_COOKIE_NAME}=${newLocale};path=/;max-age=31536000`;
-      // Also save to localStorage for persistence
-      localStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
+  const t = translations[locale] ?? translations[DEFAULT_LOCALE];
 
-      // Strip basePath first, then locale
-      let normalizedPath = pathname;
-      if (basePath && normalizedPath.startsWith(basePath)) {
-        normalizedPath = normalizedPath.slice(basePath.length);
-      }
-      const pathWithoutLocale = normalizedPath.replace(/^\/(en|it)/, '');
-      const newPath = `${basePath}/${newLocale}${pathWithoutLocale || '/'}`;
-      router.push(newPath);
-    },
-    [pathname, router, basePath]
-  );
+  // Set locale - updates state and localStorage only (no navigation)
+  const setLocale = useCallback((newLocale: Locale) => {
+    localStorage.setItem(LOCALE_STORAGE_KEY, newLocale);
+    setLocaleState(newLocale);
+  }, []);
 
   const value: I18nContextType = {
     locale,
     setLocale,
     t,
   };
+
+  // Prevent hydration mismatch by not rendering until initialized
+  if (!isInitialized) {
+    return null;
+  }
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;
 }
@@ -108,3 +114,4 @@ export function getTranslations(locale: Locale): TranslationKeys {
 // Re-export types and locales
 export type { TranslationKeys };
 export { SUPPORTED_LOCALES, type Locale };
+

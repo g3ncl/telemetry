@@ -10,7 +10,7 @@ import React from 'react';
 
 const Sidebar: React.FC = () => {
   const { t } = useI18n();
-  const { isActive, locale } = useActiveRoute();
+  const { isActive } = useActiveRoute();
   const basePath = useBasePath();
 
   return (
@@ -44,7 +44,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             key={item.id}
             component={Link}
-            href={`${basePath}/${locale}${item.path}`}
+            href={`${basePath}${item.path}`}
             label={t.nav[item.labelKey as keyof typeof t.nav]}
             leftSection={item.icon}
             active={isActive(item.path)}
@@ -63,7 +63,7 @@ const Sidebar: React.FC = () => {
       >
         <NavLink
           component={Link}
-          href={`${basePath}/${locale}${settingsNavItem.path}`}
+          href={`${basePath}${settingsNavItem.path}`}
           label={t.nav[settingsNavItem.labelKey as keyof typeof t.nav]}
           leftSection={settingsNavItem.icon}
           active={isActive(settingsNavItem.path)}

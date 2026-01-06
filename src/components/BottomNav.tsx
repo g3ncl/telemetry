@@ -10,7 +10,7 @@ import React from 'react';
 
 const BottomNav: React.FC = () => {
   const { t } = useI18n();
-  const { isActive, locale } = useActiveRoute();
+  const { isActive } = useActiveRoute();
   const basePath = useBasePath();
 
   return (
@@ -36,7 +36,7 @@ const BottomNav: React.FC = () => {
             <Box
               key={item.id}
               component={Link}
-              href={`${basePath}/${locale}${item.path}`}
+              href={`${basePath}${item.path}`}
               style={{
                 display: 'flex',
                 flexDirection: 'column',

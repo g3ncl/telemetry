@@ -1,16 +1,14 @@
 'use client';
 
 import { useBasePath } from '@/hooks/useBasePath';
-import { useI18n } from '@/lib/i18n';
 import { usePathname } from 'next/navigation';
 import { useCallback } from 'react';
 
 /**
  * Shared hook for checking if a route is active.
- * Handles locale-prefixed paths and base path when proxied via g3n.cl.
+ * Handles base path when proxied via g3n.cl.
  */
 export function useActiveRoute() {
-  const { locale } = useI18n();
   const pathname = usePathname();
   const basePath = useBasePath();
 
@@ -21,16 +19,14 @@ export function useActiveRoute() {
 
   const isActive = useCallback(
     (path: string) => {
-      const expectedPath = `/${locale}${path}`;
-      // Handle root path: /telemetry normalizes to empty, which should NOT match any specific route
+      // Handle root path
       if (!normalizedPathname || normalizedPathname === '/') {
         return false;
       }
-      return normalizedPathname === expectedPath;
+      return normalizedPathname === path;
     },
-    [normalizedPathname, locale]
+    [normalizedPathname]
   );
 
-  return { isActive, pathname, locale };
+  return { isActive, pathname };
 }
-

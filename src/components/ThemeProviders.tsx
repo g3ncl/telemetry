@@ -1,17 +1,15 @@
 'use client';
 
 import { AppNotifications } from '@/components/AppNotifications';
-import type { Locale } from '@/constants';
 import { I18nProvider } from '@/lib/i18n';
 import { createTheme, MantineProvider } from '@mantine/core';
 import { ReactNode } from 'react';
 
 interface ThemeProvidersProps {
   children: ReactNode;
-  locale: Locale;
 }
 
-export function ThemeProviders({ children, locale }: ThemeProvidersProps) {
+export function ThemeProviders({ children }: ThemeProvidersProps) {
   const theme = createTheme({
     fontFamily: '"Barlow Semi Condensed", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
     fontFamilyMonospace: '"JetBrains Mono", ui-monospace, monospace',
@@ -80,7 +78,7 @@ export function ThemeProviders({ children, locale }: ThemeProvidersProps) {
   return (
     <MantineProvider theme={theme} defaultColorScheme="dark">
       <AppNotifications />
-      <I18nProvider locale={locale}>{children}</I18nProvider>
+      <I18nProvider>{children}</I18nProvider>
     </MantineProvider>
   );
 }
