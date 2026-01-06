@@ -20,7 +20,14 @@ export function useActiveRoute() {
     : pathname;
 
   const isActive = useCallback(
-    (path: string) => normalizedPathname === `/${locale}${path}`,
+    (path: string) => {
+      const expectedPath = `/${locale}${path}`;
+      // Handle root path: /telemetry normalizes to empty, which should NOT match any specific route
+      if (!normalizedPathname || normalizedPathname === '/') {
+        return false;
+      }
+      return normalizedPathname === expectedPath;
+    },
     [normalizedPathname, locale]
   );
 
