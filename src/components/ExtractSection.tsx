@@ -7,23 +7,23 @@ import { useI18n } from '@/lib/i18n';
 import { downloadFile, formatLapTime, formatTimestamp } from '@/lib/utils';
 import type { Lap } from '@/types/types';
 import {
-  Alert,
-  Box,
-  Button,
-  Checkbox,
-  Collapse,
-  Group,
-  Modal,
-  NumberInput,
-  Paper,
-  Progress,
-  Select,
-  Stack,
-  Table,
-  Text,
-  TextInput,
-  Title,
-  UnstyledButton,
+    Alert,
+    Box,
+    Button,
+    Checkbox,
+    Collapse,
+    Group,
+    Modal,
+    NumberInput,
+    Paper,
+    Progress,
+    Select,
+    Stack,
+    Table,
+    Text,
+    TextInput,
+    Title,
+    UnstyledButton,
 } from '@mantine/core';
 import { Download, Flag, Search } from 'lucide-react';
 import React, { ChangeEvent, useMemo, useRef, useState } from 'react';
@@ -346,6 +346,7 @@ const ExtractSection: React.FC = () => {
         onClose={() => setPendingAlfanoFile(null)}
         title={t.extract.alfanoTitle}
         centered
+        zIndex={2000}
       >
         <Stack>
           <Text size="sm" c="dimmed">
