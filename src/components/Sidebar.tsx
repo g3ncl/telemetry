@@ -2,6 +2,7 @@
 
 import { mainNavItems, settingsNavItem } from '@/config/navigation';
 import { useActiveRoute } from '@/hooks/useActiveRoute';
+import { useBasePath } from '@/hooks/useBasePath';
 import { useI18n } from '@/lib/i18n';
 import { Box, NavLink, Stack, Text } from '@mantine/core';
 import Link from 'next/link';
@@ -10,6 +11,7 @@ import React from 'react';
 const Sidebar: React.FC = () => {
   const { t } = useI18n();
   const { isActive, locale } = useActiveRoute();
+  const basePath = useBasePath();
 
   return (
     <Box
@@ -42,7 +44,7 @@ const Sidebar: React.FC = () => {
           <NavLink
             key={item.id}
             component={Link}
-            href={`/${locale}${item.path}`}
+            href={`${basePath}/${locale}${item.path}`}
             label={t.nav[item.labelKey as keyof typeof t.nav]}
             leftSection={item.icon}
             active={isActive(item.path)}
@@ -61,7 +63,7 @@ const Sidebar: React.FC = () => {
       >
         <NavLink
           component={Link}
-          href={`/${locale}${settingsNavItem.path}`}
+          href={`${basePath}/${locale}${settingsNavItem.path}`}
           label={t.nav[settingsNavItem.labelKey as keyof typeof t.nav]}
           leftSection={settingsNavItem.icon}
           active={isActive(settingsNavItem.path)}

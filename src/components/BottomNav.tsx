@@ -2,6 +2,7 @@
 
 import { navItems } from '@/config/navigation';
 import { useActiveRoute } from '@/hooks/useActiveRoute';
+import { useBasePath } from '@/hooks/useBasePath';
 import { useI18n } from '@/lib/i18n';
 import { ActionIcon, Box, Group, Text } from '@mantine/core';
 import Link from 'next/link';
@@ -10,6 +11,7 @@ import React from 'react';
 const BottomNav: React.FC = () => {
   const { t } = useI18n();
   const { isActive, locale } = useActiveRoute();
+  const basePath = useBasePath();
 
   return (
     <Box
@@ -34,7 +36,7 @@ const BottomNav: React.FC = () => {
             <Box
               key={item.id}
               component={Link}
-              href={`/${locale}${item.path}`}
+              href={`${basePath}/${locale}${item.path}`}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
