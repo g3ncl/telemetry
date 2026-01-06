@@ -1,4 +1,5 @@
 module.exports = {
+  assetPrefix: process.env.URL || undefined,
   async redirects() {
     return [
       {
