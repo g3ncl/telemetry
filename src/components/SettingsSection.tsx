@@ -170,12 +170,21 @@ const SettingsSection: React.FC = () => {
     setClearing(true);
     try {
       await clearAllLaps();
+      
+      // Clear settings from localStorage
+      localStorage.removeItem('telemetry-chart-colors');
+      localStorage.removeItem('mantine-color-scheme-value');
+      localStorage.removeItem('telemetry-locale');
+
       notifications.show({
         title: t.common.success,
         message: t.settings.dataCleared,
         color: 'green',
       });
       closeConfirmModal();
+      
+      // Reload to reset state to defaults
+      window.location.reload();
     } catch (err) {
       console.error(err);
       notifications.show({
