@@ -12,8 +12,8 @@ export const CHART_RESAMPLING_POINTS = 200;
 
 // Default chart colors
 export const DEFAULT_CHART_COLORS = {
-  driver1: '#3b82f6', // Blue
-  driver2: '#f97316', // Orange
+  driver1: '#00C853', // Green
+  driver2: '#9C27B0', // Purple
 };
 
 // Time units
