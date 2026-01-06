@@ -13,11 +13,11 @@
     "@ffmpeg/util": "^0.12.2",
     "@mantine/core": "^8.3.10",
     "@mantine/hooks": "^8.3.10",
-    "@mantine/notifications": "^8.3.10",
+    "@mantine/notifications": "^8.3.11",
     "chart.js": "^4.5.1",
     "egm96-universal": "^1.1.1",
     "ffprobe-wasm": "^0.3.1",
-    "gopro-telemetry": "github:cgen0/gopro-telemetry",
+    "gopro-telemetry": "github:g3ncl/gopro-telemetry",
     "idb": "^8.0.3",
     "jszip": "^3.10.1",
     "lucide-react": "^0.562.0",
@@ -25,15 +25,15 @@
     "postcss": "^8.5.6",
     "postcss-preset-mantine": "^1.18.0",
     "postcss-simple-vars": "^7.0.1",
-    "react": "^19",
+    "react": "^19.2.3",
     "react-chartjs-2": "^5.3.1",
-    "react-dom": "^19"
+    "react-dom": "^19.2.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
-    "@types/node": "^25",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
+    "@types/node": "^25.0.3",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.51.0",
     "eslint": "^9.39.2",
     "eslint-config-next": "16.1.1",
@@ -44,6 +44,6 @@
     "stylelint-config-standard": "^39.0.1",
     "stylelint-order": "^7.0.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.51.0"
+    "typescript-eslint": "^8.52.0"
   }
 }
