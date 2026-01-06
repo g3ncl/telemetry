@@ -1,6 +1,7 @@
 'use client';
 
 import { DEFAULT_LOCALE, type Locale, SUPPORTED_LOCALES } from '@/constants';
+import { useBasePath } from '@/hooks/useBasePath';
 import { createContext, useCallback, useContext, useEffect, type ReactNode } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { en, type TranslationKeys } from './locales/en';
@@ -42,6 +43,7 @@ export function I18nProvider({ children, locale }: I18nProviderProps) {
   const t = translations[locale] ?? translations[DEFAULT_LOCALE];
   const router = useRouter();
   const pathname = usePathname();
+  const basePath = useBasePath();
 
   // Sync localStorage to cookie on mount (in case cookie was cleared but localStorage exists)
   useEffect(() => {
@@ -63,12 +65,16 @@ export function I18nProvider({ children, locale }: I18nProviderProps) {
       // Also save to localStorage for persistence
       localStorage.setItem(LOCALE_COOKIE_NAME, newLocale);
 
-      // Navigate to new locale
-      const pathWithoutLocale = pathname.replace(/^\/(en|it)/, '');
-      const newPath = `/${newLocale}${pathWithoutLocale || '/'}`;
+      // Strip basePath first, then locale
+      let normalizedPath = pathname;
+      if (basePath && normalizedPath.startsWith(basePath)) {
+        normalizedPath = normalizedPath.slice(basePath.length);
+      }
+      const pathWithoutLocale = normalizedPath.replace(/^\/(en|it)/, '');
+      const newPath = `${basePath}/${newLocale}${pathWithoutLocale || '/'}`;
       router.push(newPath);
     },
-    [pathname, router]
+    [pathname, router, basePath]
   );
 
   const value: I18nContextType = {

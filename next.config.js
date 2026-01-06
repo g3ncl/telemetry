@@ -1,4 +1,7 @@
 module.exports = {
+  env: {
+    NEXT_PUBLIC_SITE_URL: process.env.URL,
+  },
   assetPrefix: process.env.URL || undefined,
   async redirects() {
     return [
