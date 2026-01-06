@@ -1,4 +1,4 @@
-# Kart Telemetry
+# Telemetry
 
 A web application for extracting, visualizing, and analyzing GPS telemetry data from GoPro video files and standard telemetry formats.
 

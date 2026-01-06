@@ -129,7 +129,7 @@ export interface TranslationKeys {
 
 export const en: TranslationKeys = {
   // App
-  appName: 'Kart Telemetry',
+  appName: 'Telemetry',
   appDescription: 'GPS telemetry extraction and lap analysis',
 
   // Navigation

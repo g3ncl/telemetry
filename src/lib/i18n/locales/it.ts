@@ -2,7 +2,7 @@ import type { TranslationKeys } from './en';
 
 export const it: TranslationKeys = {
   // App
-  appName: 'Kart Telemetry',
+  appName: 'Telemetry',
   appDescription: 'Estrazione telemetria GPS e analisi giri',
 
   // Navigation

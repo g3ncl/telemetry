@@ -5,26 +5,26 @@ import { localeNames, useI18n, type Locale } from '@/lib/i18n';
 import { downloadFile } from '@/lib/utils';
 import type { SavedLap, SavedTrack } from '@/types/types';
 import {
-    ActionIcon,
-    Badge,
-    Box,
-    Button,
-    Card,
-    ColorInput,
-    Divider,
-    Group,
-    Modal,
-    NumberInput,
-    Paper,
-    Select,
-    SimpleGrid,
-    Skeleton,
-    Stack,
-    Text,
-    Textarea,
-    TextInput,
-    Title,
-    useMantineColorScheme
+  ActionIcon,
+  Badge,
+  Box,
+  Button,
+  Card,
+  ColorInput,
+  Divider,
+  Group,
+  Modal,
+  NumberInput,
+  Paper,
+  Select,
+  SimpleGrid,
+  Skeleton,
+  Stack,
+  Text,
+  Textarea,
+  TextInput,
+  Title,
+  useMantineColorScheme
 } from '@mantine/core';
 import { useDisclosure, useLocalStorage } from '@mantine/hooks';
 import { notifications } from '@mantine/notifications';
@@ -214,7 +214,7 @@ const SettingsSection: React.FC = () => {
       };
 
       const dateStr = new Date().toISOString().split('T')[0];
-      downloadFile(exportData, `kart-telemetry-backup-${dateStr}.json`);
+      downloadFile(exportData, `telemetry-backup-${dateStr}.json`);
       notifications.show({
         title: t.common.success,
         message: t.settings.exportSuccess,

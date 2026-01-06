@@ -17,7 +17,7 @@ const mono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: 'Kart Telemetry',
+  title: 'Telemetry',
   description: 'GPS telemetry extraction and lap analysis',
 };
 

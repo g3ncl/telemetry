@@ -1,5 +1,5 @@
-import { tracks as HARDCODED_TRACKS } from '@/utils/tracks';
 import type { Lap, SavedLap, SavedTrack } from '@/types/types';
+import { tracks as HARDCODED_TRACKS } from '@/utils/tracks';
 import { DBSchema, IDBPDatabase, openDB } from 'idb';
 
 // Fallback UUID generator for browsers without crypto.randomUUID
@@ -28,7 +28,7 @@ interface TelemetryDB extends DBSchema {
   };
 }
 
-const DB_NAME = 'kart-telemetry';
+const DB_NAME = 'telemetry';
 const DB_VERSION = 4; // Incremented for system track flag
 
 let dbPromise: Promise<IDBPDatabase<TelemetryDB>> | null = null;
