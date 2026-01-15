@@ -53,7 +53,19 @@ export const useTelemetryExtraction = () => {
       setProgress(0);
       return;
     }
-    const message = err instanceof Error ? err.message : 'Unknown error';
+    // Log the actual error for debugging
+    console.error('Extraction error:', err);
+
+    // Provide detailed error message
+    let message = 'Unknown error';
+    if (err instanceof Error) {
+      message = err.message;
+    } else if (typeof err === 'string') {
+      message = err;
+    } else {
+      message = 'Unknown error: ' + String(err);
+    }
+
     setError(message);
     setLoading(false);
     setProgress(0);
@@ -93,6 +105,7 @@ export const useTelemetryExtraction = () => {
     setLoading(true);
     setError('');
     setProgress(0);
+    setLaps(undefined); // Clear previous laps when loading new file
     setDetectedTrackName('');
 
     try {
@@ -144,9 +157,9 @@ export const useTelemetryExtraction = () => {
       }
 
       if (!selectedTrack) {
-         setError('Track selection failed');
-         setLoading(false);
-         return;
+        setError('Track selection failed');
+        setLoading(false);
+        return;
       }
 
       const extractedLaps: Lap[] = splitTelemetryByLaps(data, selectedTrack);

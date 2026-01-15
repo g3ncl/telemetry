@@ -1,0 +1,68 @@
+name: Deploy to S3
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm build
+
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          # Upload assets with long cache (1 year, immutable)
+          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
+            --delete \
+            --cache-control "max-age=31536000,immutable" \
+            --exclude "*.html" \
+            --exclude "robots.txt" \
+            --exclude "sitemap.xml"
+          
+          # Upload HTML files with no cache
+          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
+            --cache-control "no-cache" \
+            --content-type "text/html" \
+            --exclude "*" \
+            --include "*.html"
+          
+          # Upload other special files with no cache
+          aws s3 sync out/ s3://${{ secrets.S3_BUCKET }} \
+            --cache-control "no-cache" \
+            --exclude "*" \
+            --include "robots.txt" \
+            --include "sitemap.xml"
+
+      - name: Set CORS and Security Headers on S3
+        run: |
+          # Note: COEP/COOP headers are required for SharedArrayBuffer (ffmpeg)
+          # These need to be set via CloudFront response headers policy
+          echo "Remember to configure CloudFront response headers policy with:"
+          echo "  - Cross-Origin-Embedder-Policy: require-corp"
+          echo "  - Cross-Origin-Opener-Policy: same-origin"
+
+      - name: Invalidate CloudFront
+        run: |
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
